@@ -1,0 +1,30 @@
+{
+  "direction_name": "子方向13：HR模块干货",
+  "max_concurrent": 3,
+  "sources": [
+    {
+      "name": "三茅人力资源网",
+      "url": "https://www.hrloo.com",
+      "type": "专业社区",
+      "category": "HR实操",
+      "pattern": "/article/\\d+",
+      "date_in_md": "(\\d{4}-\\d{2}-\\d{2})"
+    },
+    {
+      "name": "KnowYourself",
+      "url": "https://www.knowyourself.cc",
+      "type": "自媒体",
+      "category": "HR实操",
+      "pattern": "/article/\\d+",
+      "date_in_md": "(\\d{4}-\\d{2}-\\d{2})"
+    },
+    {
+      "name": "i人事",
+      "url": "https://www.ihr360.com",
+      "type": "HR SaaS",
+      "category": "HR实操",
+      "pattern": "\\.com/[^)'\\\"<>\\s]+",
+      "date_in_md": "(\\d{4}-\\d{2}-\\d{2})"
+    }
+  ]
+}

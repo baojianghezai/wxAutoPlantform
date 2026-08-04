@@ -1,0 +1,6 @@
+{
+  "last": 4,
+  "note": "轮换发文稿B模板：每次 Task2 运行取 (last+1) % N 的下一个模板。N = templates/96 顶层 + real/ 内全部 *.html。",
+  "real_dir": "real",
+  "count": 37
+}

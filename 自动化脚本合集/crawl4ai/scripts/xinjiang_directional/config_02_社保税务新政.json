@@ -1,0 +1,30 @@
+{
+  "direction_name": "子方向2：社保税务新政",
+  "max_concurrent": 3,
+  "sources": [
+    {
+      "name": "国家税务总局",
+      "url": "https://www.chinatax.gov.cn",
+      "type": "官网",
+      "category": "社保税务",
+      "pattern": "\\.gov\\.cn/[^)'\\\"<>\\s]+\\.html",
+      "date_in_md": "(\\d{4}-\\d{2}-\\d{2})"
+    },
+    {
+      "name": "国家医疗保障局",
+      "url": "https://www.nhsa.gov.cn",
+      "type": "官网",
+      "category": "社保税务",
+      "pattern": "\\.gov\\.cn/[^)'\\\"<>\\s]+\\.html",
+      "date_in_md": "(\\d{4}-\\d{2}-\\d{2})"
+    },
+    {
+      "name": "国家统计局",
+      "url": "https://www.stats.gov.cn",
+      "type": "官网",
+      "category": "社保税务",
+      "pattern": "\\.gov\\.cn/[^)'\\\"<>\\s]+\\.html",
+      "date_in_md": "(\\d{4}-\\d{2}-\\d{2})"
+    }
+  ]
+}

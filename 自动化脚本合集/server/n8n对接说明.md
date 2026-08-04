@@ -1,0 +1,99 @@
+# n8n 对接说明
+
+> 本地 Flask 服务：`自动化脚本合集/server/app.py`，默认 `http://localhost:5001`
+> （5000 已被目标机 Docker 上的 RSS 服务占用）。
+> 启动：双击项目根目录 `启动服务.bat`（首次自动建 `.venv` 装依赖）；或手动 `python server/app.py`。
+
+## 完整流程时序
+
+```
+n8n 定时触发
+  → ① POST /api/waitUrl        登记 wait 节点回调地址
+  → ② GET  /api/run            触发爬虫 pipeline（立即返回 202，后台跑）
+  → (n8n Wait 节点挂起，等 Flask 回调)
+  → Flask 爬虫结束 → POST {waitUrl}   唤醒 n8n
+  → ③ n8n 调钉钉 API 发审核通知
+  → 运营打开前端 http://localhost:5173 选文章 + 模板
+  → 前端 POST /api/submit → Flask 抓原文 HTML → POST {waitUrl}（带 html）
+  → ④ n8n 收到 HTML，去标签 → 大模型改写成结构化 JSON
+  → ⑤ n8n POST /api/publish（结构化 JSON）→ 渲染模板 → 推微信草稿箱
+```
+
+## 各节点契约
+
+### ① POST /api/waitUrl
+
+请求：
+```json
+{"url": "https://<n8n>/webhook-waiting/xxxxx"}
+```
+响应：`{"code": 0}`。URL 落盘 `server/state.json`，重启不丢。
+
+### ② GET /api/run
+
+响应（立即返回）：`{"code": 0, "msg": "pipeline started"}`
+运行中重复调用：`{"code": 1, "msg": "pipeline already running"}`
+
+**爬虫结束后 Flask 回调 waitUrl 的 payload：**
+```json
+{
+  "code": 0,
+  "msg": "pipeline done",
+  "stats": {"web_total": 40, "wechat_total": 34, "total": 74, "failed_directions": []}
+}
+```
+
+### ③ 前端 → /api/submit（前端自动调，n8n 无需关心）
+
+前端确认推送后，Flask 抓原文 HTML 并回调 waitUrl：
+
+**Flask → waitUrl 的 payload（n8n Wait 节点收到的数据）：**
+```json
+{
+  "article_id": "web_8201fbd9",
+  "title": "文章标题",
+  "url": "原文链接",
+  "html": "原文正文 HTML（已提取正文区域）",
+  "template_id": "zhaopin1"
+}
+```
+
+### ④ n8n 大模型处理（prompt 约束）
+
+对 `html` 去标签后交给大模型，**要求大模型输出严格 JSON**：
+
+```json
+{
+  "content_type": "job_list | solar_term | 其他",
+  "template_id": "可选，显式指定模板（zhaopin1/zhaopin2/xiaoshu）",
+  "title": "公众号文章标题",
+  "digest": "摘要，可选",
+  "sections": [
+    {"type": "hero", "title": "...", "subtitle": "..."},
+    {"type": "cards", "items": [{"title": "...", "fields": {"键": "值"}, "tags": ["..."], "description": "..."}]},
+    {"type": "key_points", "title": "...", "points": ["...", "..."]},
+    {"type": "paragraph", "heading": "可选", "text": "..."},
+    {"type": "image", "url": "...", "caption": "可选"}
+  ]
+}
+```
+
+- `content_type` 决定默认模板与渲染器：`job_list`（招聘岗位）、`solar_term`（节气时令），其他值走兜底渲染。
+- sections 的 type 目前支持：`hero` / `cards` / `key_points` / `paragraph` / `image`，顺序任意。
+
+### ⑤ POST /api/publish
+
+请求体 = 大模型输出的结构化 JSON（原样 POST 即可）。
+
+成功响应：`{"code": 0, "media_id": "..."}`
+失败响应：`{"code": 1, "msg": "..."}`（HTTP 500）
+
+**注意**：推草稿箱要求运行机器的公网 IP 在公众号后台的 IP 白名单内，否则报 `errcode 40164`。凭证优先读环境变量 `WECHAT_APPID` / `WECHAT_SECRET`，回退 `config.json`。
+
+## 前端接口（ vite dev 已配置 /api 代理）
+
+| 接口 | 用途 |
+|------|------|
+| `GET /api/articles` | 文章卡片列表（web + wechat 合并 feed） |
+| `GET /api/templates` | 模板列表（含 previewHtml 预览） |
+| `POST /api/submit` | 选定文章+模板，触发原文 HTML 回调 n8n |

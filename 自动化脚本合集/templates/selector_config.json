@@ -1,0 +1,43 @@
+{
+  "content_types": {
+    "job_list": {
+      "label": "招聘岗位",
+      "templates": [
+        {
+          "id": "zhaopin1",
+          "name": "春季招聘（清新蓝）",
+          "file": "选出来/招聘1.html",
+          "style": "blue",
+          "description": "蓝天白云背景，清新正式，适合综合招聘"
+        },
+        {
+          "id": "zhaopin2", 
+          "name": "企业招聘（纯白蓝）",
+          "file": "选出来/招聘2.html",
+          "style": "white_blue",
+          "description": "纯白背景+蓝色点缀，适合煤矿/能源等硬核行业"
+        }
+      ],
+      "default": "zhaopin1",
+      "renderer": "render_job_list"
+    },
+    "solar_term": {
+      "label": "节气时令",
+      "templates": [
+        {
+          "id": "xiaoshu",
+          "name": "大暑时节",
+          "file": "选出来/节气-大暑.html",
+          "style": "seasonal",
+          "description": "图文混排，适合节气、时令、节日内容"
+        }
+      ],
+      "default": "xiaoshu",
+      "renderer": "render_solar_term"
+    }
+  },
+  "fallback": {
+    "template": "选出来/招聘1.html",
+    "renderer": "render_job_list"
+  }
+}

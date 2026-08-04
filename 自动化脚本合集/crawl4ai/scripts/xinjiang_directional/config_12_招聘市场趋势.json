@@ -1,0 +1,30 @@
+{
+  "direction_name": "子方向12：招聘市场趋势",
+  "max_concurrent": 3,
+  "sources": [
+    {
+      "name": "猎聘",
+      "url": "https://www.liepin.com",
+      "type": "招聘平台",
+      "category": "招聘市场",
+      "pattern": "\\.com/[^)'\\\"<>\\s]+",
+      "date_in_md": "(\\d{4}-\\d{2}-\\d{2})"
+    },
+    {
+      "name": "智联招聘",
+      "url": "https://www.zhaopin.com",
+      "type": "招聘平台",
+      "category": "招聘市场",
+      "pattern": "\\.com/[^)'\\\"<>\\s]+",
+      "date_in_md": "(\\d{4}-\\d{2}-\\d{2})"
+    },
+    {
+      "name": "BOSS直聘",
+      "url": "https://www.zhipin.com",
+      "type": "招聘平台",
+      "category": "招聘市场",
+      "pattern": "\\.com/[^)'\\\"<>\\s]+",
+      "date_in_md": "(\\d{4}-\\d{2}-\\d{2})"
+    }
+  ]
+}

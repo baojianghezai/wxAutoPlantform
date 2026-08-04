@@ -1,0 +1,59 @@
+{
+  "rss_url": "http://192.168.10.240:5000/api/rss/all",
+  "days": 7,
+  "accounts": {
+    "gov": [
+      "青岛市国企招聘",
+      "青岛人才",
+      "青岛12333",
+      "青岛人社"
+    ],
+    "media": [
+      "半岛都市报即墨",
+      "山东华图"
+    ]
+  },
+  "cross_account_aliases": [
+    [
+      "水发集团"
+    ],
+    [
+      "李沧区"
+    ]
+  ],
+  "known_companies": [
+    "青岛啤酒",
+    "东方影都",
+    "水发集团",
+    "海尔",
+    "海信",
+    "青啤"
+  ],
+  "candidates_dir": "candidates",
+  "review_dir": "review",
+  "selected_file": "selected.json",
+  "selected_links_file": "selected_links.txt",
+  "rss_cache": "rss_cache.xml",
+  "max_images": 12,
+  "filter_expired": true,
+  "task2": {
+    "tail_images_dir": "tail_images",
+    "b_photos_dir": "b_photos",
+    "b_photos_done_dir": "b_photos/done",
+    "b_extracted": "b_photos/extracted.json",
+    "templates_dir": "templates",
+    "templates_96_dir": "templates/96",
+    "articleB_template": "96wx_cards",
+    "articleB_title": "企业招聘，就等你来",
+    "articleB_style_fixed": "",
+    "articleA_templates_dir": "templates/articleA",
+    "a_source": "a_source.json",
+    "drafts_dir": "drafts",
+    "normalize_image_urls": true,
+    "publish_mode": "auto"
+  },
+  "wechat": {
+    "appid": "请填写你的公众号AppID",
+    "secret": "请填写你的公众号AppSecret（或使用环境变量 WECHAT_APPID / WECHAT_SECRET）"
+  }
+}

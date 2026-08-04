@@ -1,0 +1,38 @@
+{
+  "direction_name": "子方向3：地方人才政策",
+  "max_concurrent": 4,
+  "sources": [
+    {
+      "name": "青岛市人社局",
+      "url": "https://hrss.qingdao.gov.cn",
+      "type": "地方官网",
+      "category": "地方人才政策",
+      "pattern": "\\.gov\\.cn/[^)'\\\"<>\\s]+\\.html",
+      "date_in_md": "(\\d{4}-\\d{2}-\\d{2})"
+    },
+    {
+      "name": "北京市人社局",
+      "url": "https://rsj.beijing.gov.cn",
+      "type": "地方官网",
+      "category": "地方人才政策",
+      "pattern": "\\.gov\\.cn/[^)'\\\"<>\\s]+\\.html",
+      "date_in_md": "(\\d{4}-\\d{2}-\\d{2})"
+    },
+    {
+      "name": "上海市人社局",
+      "url": "https://rsj.sh.gov.cn",
+      "type": "地方官网",
+      "category": "地方人才政策",
+      "pattern": "\\.gov\\.cn/[^)'\\\"<>\\s]+\\.html",
+      "date_in_md": "(\\d{4}-\\d{2}-\\d{2})"
+    },
+    {
+      "name": "深圳市人社局",
+      "url": "https://hrss.sz.gov.cn",
+      "type": "地方官网",
+      "category": "地方人才政策",
+      "pattern": "\\.gov\\.cn/[^)'\\\"<>\\s]+\\.html",
+      "date_in_md": "(\\d{4}-\\d{2}-\\d{2})"
+    }
+  ]
+}

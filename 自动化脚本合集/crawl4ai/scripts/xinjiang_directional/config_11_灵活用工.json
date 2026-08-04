@@ -1,0 +1,30 @@
+{
+  "direction_name": "子方向11：灵活用工/蓝领HR",
+  "max_concurrent": 3,
+  "sources": [
+    {
+      "name": "京东物流",
+      "url": "https://www.jdl.com",
+      "type": "企业",
+      "category": "灵活用工",
+      "pattern": "\\.com/[^)'\\\"<>\\s]+",
+      "date_in_md": "(\\d{4}-\\d{2}-\\d{2})"
+    },
+    {
+      "name": "HRoot",
+      "url": "https://www.hroot.com",
+      "type": "行业媒体",
+      "category": "灵活用工",
+      "pattern": "\\.com/[^)'\\\"<>\\s]+",
+      "date_in_md": "(\\d{4}-\\d{2}-\\d{2})"
+    },
+    {
+      "name": "第一资源",
+      "url": "https://www.tophr.net",
+      "type": "行业媒体",
+      "category": "灵活用工",
+      "pattern": "\\.net/[^)'\\\"<>\\s]+",
+      "date_in_md": "(\\d{4}-\\d{2}-\\d{2})"
+    }
+  ]
+}

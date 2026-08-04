@@ -1,0 +1,56 @@
+# ===== 凭证 / 敏感信息 =====
+# config.json 含真实微信公众号 AppSecret 等凭证，不入库（可参考 config.example.json）
+自动化脚本合集/config.json
+*.env
+.env.*
+!.env.example
+
+# ===== AI 工作日志（含凭证引用/内部网络/96 编辑器 cookie）=====
+自动化脚本合集/.workbuddy/
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+*.egg-info/
+.eggs/
+build/
+develop-eggs/
+dist/
+.idea/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ===== Node / 前端 =====
+node_modules/
+wxcheck/dist/
+*.local
+npm-debug.log*
+
+# ===== 运行时状态 / 日志 / 缓存 =====
+*.log
+自动化脚本合集/server/state.json
+自动化脚本合集/server/mock_received.jsonl
+自动化脚本合集/server/mock_llm_input.json
+自动化脚本合集/server/mock_llm_output.json
+自动化脚本合集/task1_status.json
+自动化脚本合集/rss_cache.xml
+
+# ===== 爬虫抓取产物（可由脚本重新生成）=====
+自动化脚本合集/review/index.html
+自动化脚本合集/review/index.json
+自动化脚本合集/crawl4ai/scripts/xinjiang_output/
+自动化脚本合集/crawl4ai/scripts/xinjiang_directional/xinjiang_output/
+自动化脚本合集/crawl4ai/scripts/xinjiang_directional/__pycache__/
+自动化脚本合集/_archive/crawl4ai_scripts/court_output/
+
+# ===== 系统 / 编辑器 =====
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.tmp
