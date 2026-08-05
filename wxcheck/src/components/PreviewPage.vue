@@ -28,6 +28,12 @@ const articleTitle = computed(() => {
   return t.length > 20 ? t.slice(0, 20) + '...' : t;
 });
 
+// 外链缩略图走后端代理，避免 mmbiz 防盗链加载失败
+const thumbUrl = computed(() => {
+  if (!props.article?.thumbnail) return '';
+  return `/api/img?url=${encodeURIComponent(props.article.thumbnail)}`;
+});
+
 function handlePush() {
   emit('push');
 }
@@ -63,7 +69,7 @@ function handleBack() {
           <div v-if="hasArticle" class="phone-content" :style="displayStyle">
             <!-- 缩略图 -->
             <div class="preview-thumb">
-              <img v-if="article!.thumbnail" :src="article!.thumbnail" alt="" />
+              <img v-if="thumbUrl" :src="thumbUrl" alt="" />
               <div v-else class="thumb-ph">
                 <el-icon :size="28" color="#c0c4cc"><Picture /></el-icon>
               </div>

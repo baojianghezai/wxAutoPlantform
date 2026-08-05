@@ -20,6 +20,12 @@ const sourceTypeColor = computed(() =>
   props.article.source_type === 'wechat' ? 'warning' : 'info'
 );
 
+// 外链缩略图走后端代理 /api/img?url=，绕过 mmbiz 等防盗链
+const thumbUrl = computed(() => {
+  if (!props.article.thumbnail) return '';
+  return `/api/img?url=${encodeURIComponent(props.article.thumbnail)}`;
+});
+
 function handleCardClick() {
   emit('select');
 }
@@ -27,6 +33,10 @@ function handleCardClick() {
 function handleViewUrl(e: Event) {
   e.stopPropagation();
   emit('view-url', props.article.url);
+}
+
+function handleThumbError(e: Event) {
+  (e.target as HTMLElement).style.display = 'none';
 }
 </script>
 
@@ -38,7 +48,7 @@ function handleViewUrl(e: Event) {
   >
     <!-- 缩略图 -->
     <div class="card-thumb">
-      <img v-if="article.thumbnail" :src="article.thumbnail" alt="" />
+      <img v-if="thumbUrl" :src="thumbUrl" alt="" @error="handleThumbError" />
       <div v-else class="thumb-placeholder">
         <el-icon :size="24" color="#c0c4cc"><Picture /></el-icon>
       </div>

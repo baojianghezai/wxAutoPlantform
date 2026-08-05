@@ -20,6 +20,7 @@ export interface Template {
   style: string;
   description: string;
   previewHtml: string;
+  previewImage: string;
 }
 
 export interface UnifiedResponse {

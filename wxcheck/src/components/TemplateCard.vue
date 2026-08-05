@@ -21,9 +21,17 @@ function handleClick() {
     :class="{ 'is-selected': selected }"
     @click="handleClick"
   >
-    <!-- 手机预览缩略图 -->
+    <!-- 模板本地预览图 -->
     <div class="phone-thumb-wrapper">
-      <div class="phone-thumb" v-html="template.previewHtml" />
+      <img
+        v-if="template.previewImage"
+        :src="template.previewImage"
+        alt=""
+        class="preview-img"
+      />
+      <div v-else class="thumb-placeholder">
+        <el-icon :size="24" color="#c0c4cc"><Picture /></el-icon>
+      </div>
     </div>
 
     <!-- 底部信息 -->
@@ -71,7 +79,7 @@ function handleClick() {
 
 .phone-thumb-wrapper {
   width: 100%;
-  height: 140px;
+  height: 200px;
   overflow: hidden;
   background: #f5f5f5;
   display: flex;
@@ -79,24 +87,21 @@ function handleClick() {
   justify-content: center;
 }
 
-/* 真实模板 HTML 较长且样式复杂：裁剪 + 缩放，避免撑破卡片 */
-.phone-thumb {
-  width: 90%;
-  height: 90%;
-  transform: scale(0.85);
-  transform-origin: center;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.phone-thumb :deep(*) {
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-.phone-thumb :deep(img) {
-  max-width: 100%;
+/* 本地预览图：等比缩放铺满，避免撑破卡片 */
+.preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   display: block;
+}
+
+.thumb-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ebeef5;
 }
 
 .card-footer {

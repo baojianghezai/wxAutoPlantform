@@ -8,6 +8,8 @@
   GET  /api/templates 展开 templates/selector_config.json 为扁平模板列表
   POST /api/submit    {article_id, template_id} 抓原文 HTML → POST 到 waitUrl
   POST /api/publish   n8n 回调：渲染契约 JSON → render_article → push_to_draft
+  GET  /api/img?url=  图片代理：带 UA/Referer 抓取外链图，绕过防盗链
+  GET  /api/tpl-preview/<name>  返回模板本地预览图（assets/template-previews/）
 
 运行：python server/app.py（依赖见 server/requirements.txt），端口 5001
 （5000 已被目标机 Docker 上的 RSS 服务占用）。
@@ -20,7 +22,7 @@ import threading
 from datetime import datetime
 
 import requests
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file, send_from_directory
 from flask_cors import CORS
 
 BASE = os.path.dirname(os.path.abspath(__file__))          # server/
@@ -41,8 +43,19 @@ UNIFIED_JSON = os.path.join(PROJECT_ROOT, "crawl4ai", "scripts",
                             "xinjiang_output", "unified_articles.json")
 TEMPLATES_DIR = os.path.join(PROJECT_ROOT, "templates")
 SELECTOR_CONFIG = os.path.join(TEMPLATES_DIR, "selector_config.json")
+# 模板本地预览图目录（由 assets/gen_template_previews.py 生成）
+TEMPLATE_PREVIEWS_DIR = os.path.join(PROJECT_ROOT, "assets", "template-previews")
 # 前端产物（wxcheck/dist，与 自动化脚本合集 同级）；存在则由本服务直接托管
 FRONTEND_DIST = os.path.join(os.path.dirname(PROJECT_ROOT), "wxcheck", "dist")
+
+# 图片代理默认请求头（绕过 mmbiz / 96weixin 等防盗链）
+_IMG_HEADERS = {
+    "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                   "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"),
+    "Referer": "https://mp.weixin.qq.com/",
+}
+_IMG_WHITELIST_HOSTS = ("mmbiz.qpic.cn", "newcdn.96weixin.com", "mmbiz.qlogo.cn",
+                        "mp.weixin.qq.com", "wx.qlogo.cn", "mmbiz.qpic.cn")
 
 app = Flask(__name__)
 CORS(app)
@@ -158,6 +171,7 @@ def templates():
     for ctype, block in (cfg.get("content_types") or {}).items():
         label = block.get("label", ctype)
         for tpl in block.get("templates", []):
+            tpl_id = tpl.get("id", "")
             preview = ""
             tpl_path = os.path.join(TEMPLATES_DIR, tpl.get("file", ""))
             try:
@@ -167,16 +181,53 @@ def templates():
                 preview = (m.group(1) if m else html_text).strip()[:2000]
             except Exception as e:
                 preview = f"<!-- preview unavailable: {e} -->"
+            # 本地预览图：/api/tpl-preview/<id>.png（由 assets/gen_template_previews.py 生成）
+            preview_img = f"/api/tpl-preview/{tpl_id}.png"
+            if not os.path.isfile(os.path.join(TEMPLATE_PREVIEWS_DIR, f"{tpl_id}.png")):
+                preview_img = ""
             out.append({
-                "id": tpl.get("id", ""),
+                "id": tpl_id,
                 "name": tpl.get("name", ""),
                 "content_type": ctype,
                 "content_type_label": label,
                 "style": tpl.get("style", ""),
                 "description": tpl.get("description", ""),
                 "previewHtml": preview,
+                "previewImage": preview_img,
             })
     return jsonify({"code": 0, "templates": out})
+
+
+# ---------------------------------------------------------------- /api/img（图片代理，绕过防盗链）
+
+@app.route("/api/img", methods=["GET"])
+def img_proxy():
+    url = (request.args.get("url") or "").strip()
+    if not url or not url.startswith(("http://", "https://")):
+        return _err("missing or invalid url", status=400)
+    try:
+        resp = requests.get(url, headers=_IMG_HEADERS, timeout=20, stream=True)
+        if resp.status_code != 200:
+            return _err(f"fetch failed: HTTP {resp.status_code}", status=502)
+        ctype = resp.headers.get("Content-Type", "application/octet-stream")
+        if not ctype.startswith("image/"):
+            ctype = "image/jpeg"
+        data = resp.raw.read(8 * 1024 * 1024)  # 上限 8MB
+        return send_file(__import__("io").BytesIO(data), mimetype=ctype,
+                         max_age=86400)
+    except Exception as e:
+        return _err(f"proxy error: {e}", status=502)
+
+
+# ---------------------------------------------------------------- /api/tpl-preview（模板本地预览图）
+
+@app.route("/api/tpl-preview/<name>", methods=["GET"])
+def tpl_preview(name):
+    safe = os.path.basename(name)
+    path = os.path.join(TEMPLATE_PREVIEWS_DIR, safe)
+    if not os.path.isfile(path):
+        return _err("preview not found", status=404)
+    return send_from_directory(TEMPLATE_PREVIEWS_DIR, safe, max_age=86400)
 
 
 # ---------------------------------------------------------------- /api/submit
