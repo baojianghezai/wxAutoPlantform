@@ -20,12 +20,6 @@ const sourceTypeColor = computed(() =>
   props.article.source_type === 'wechat' ? 'warning' : 'info'
 );
 
-// 外链缩略图走后端代理 /api/img?url=，绕过 mmbiz 等防盗链
-const thumbUrl = computed(() => {
-  if (!props.article.thumbnail) return '';
-  return `/api/img?url=${encodeURIComponent(props.article.thumbnail)}`;
-});
-
 function handleCardClick() {
   emit('select');
 }
@@ -33,10 +27,6 @@ function handleCardClick() {
 function handleViewUrl(e: Event) {
   e.stopPropagation();
   emit('view-url', props.article.url);
-}
-
-function handleThumbError(e: Event) {
-  (e.target as HTMLElement).style.display = 'none';
 }
 </script>
 
@@ -46,14 +36,6 @@ function handleThumbError(e: Event) {
     :class="{ 'is-selected': selected }"
     @click="handleCardClick"
   >
-    <!-- 缩略图 -->
-    <div class="card-thumb">
-      <img v-if="thumbUrl" :src="thumbUrl" alt="" @error="handleThumbError" />
-      <div v-else class="thumb-placeholder">
-        <el-icon :size="24" color="#c0c4cc"><Picture /></el-icon>
-      </div>
-    </div>
-
     <!-- 内容 -->
     <div class="card-body">
       <div class="card-title">{{ article.title }}</div>
@@ -98,7 +80,6 @@ function handleThumbError(e: Event) {
   border: 2px solid #e0e0e0;
   border-radius: 10px;
   padding: 12px;
-  gap: 12px;
   cursor: pointer;
   transition: all 0.25s ease;
 }
@@ -113,30 +94,6 @@ function handleThumbError(e: Event) {
   border-color: #409eff;
   box-shadow: 0 0 0 3px rgba(64, 158, 255, 0.12);
   background: #f0f7ff;
-}
-
-.card-thumb {
-  width: 80px;
-  height: 80px;
-  border-radius: 8px;
-  overflow: hidden;
-  flex-shrink: 0;
-  background: #f5f5f5;
-}
-
-.card-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.thumb-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #ebeef5;
 }
 
 .card-body {
