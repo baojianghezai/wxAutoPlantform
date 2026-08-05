@@ -123,7 +123,7 @@ RSS招聘汇总_定时任务提示词.md      RSS 汇总自包含提示词
 - `rss`：RSS 地址、账号分级（两级留存）、天数窗口。
 - `filter_expired`：时效性过滤开关（默认 true）。
 - `task2`：`tail_images_dir`/`b_photos_dir`/`b_photos_done_dir`/`drafts_dir`/`templates_96_dir`/`templates/articleA`(`articleA_templates_dir`)/`a_source`/`articleB_title`/`articleB_style_fixed`(已置空→B轮换)/`publish_mode`（auto|html）。
-- `wechat`：`appid`/`secret`（已配置测试号 `wxd676e5b7f48d1136`，IP 白名单已生效）。
+- `wechat`：`appid`/`secret`（已配置测试号，IP 白名单已生效）。
 
 ## 七、待办与已知局限
 - articleA 新流程为「线索→官网→模板整理」，内容来自企业官网而非公众号原文；仅当 `a_source.json` 缺失走回退旧流程时，才可能带入公众号原文中的微信独有组件（音视频/小程序卡片），换号重发可能丢失，选稿时留意。
