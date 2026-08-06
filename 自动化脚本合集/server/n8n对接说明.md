@@ -80,6 +80,7 @@ n8n 定时触发
 
 - `content_type` 决定默认模板与渲染器：`job_list`（招聘岗位）、`solar_term`（节气时令），其他值走兜底渲染。
 - sections 的 type 目前支持：`hero` / `cards` / `key_points` / `paragraph` / `image`，顺序任意。
+- **`template_id` 必须原样透传**：Wait② payload 中若带 `template_id`（前端运营选的模板），大模型输出必须原样带上、不得省略或修改；仅当输入无 `template_id` 时才省略（由系统按 content_type 默认模板兜底）。—— 完整字段规则见 `docs/04-大模型字段说明书.md`。
 
 ### ⑤ POST /api/publish
 
