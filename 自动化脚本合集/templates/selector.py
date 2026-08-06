@@ -40,23 +40,43 @@ def list_templates(content_type):
     return ct.get("templates", [])
 
 
+def _find_template_global(template_id):
+    """在所有 content_types 中全局查找 template_id 对应的模板。
+
+    返回 (template, content_type)；找不到返回 (None, None)。
+    """
+    if not template_id:
+        return None, None
+    cfg = _load_config()
+    for ctype, block in (cfg.get("content_types") or {}).items():
+        for t in block.get("templates", []):
+            if t.get("id") == template_id:
+                return t, ctype
+    return None, None
+
+
 def select_template(content_type, template_id=None):
     """选择模板。
 
     优先：
-    1. 显式指定 template_id
+    1. 显式指定 template_id（先查当前类型，再跨类型全局查找）
     2. 该类型的 default
     3. fallback
     """
     cfg = _load_config()
     ct = cfg.get("content_types", {}).get(content_type, {})
 
-    # 1. 显式指定
+    # 1. 显式指定：先当前类型，再全局（允许跨类型复用）
     if template_id:
         for t in ct.get("templates", []):
             if t["id"] == template_id:
                 return t
-        # 指定的 id 不属于该类型，尝试全局查找（允许跨类型复用）
+        tpl, owner = _find_template_global(template_id)
+        if tpl:
+            if owner and owner != content_type:
+                tpl = dict(tpl)
+                tpl["owner_content_type"] = owner
+            return tpl
 
     # 2. 类型默认
     default_id = ct.get("default")
@@ -106,7 +126,9 @@ def classify_and_select(data):
         tpl = select_template("")
         renderer = ""
     else:
-        renderer = get_renderer_name(content_type)
+        # 跨类型复用模板时，渲染器跟随模板实际归属的类型（如 xiaoshu → render_solar_term）
+        effective_type = tpl.get("owner_content_type") or content_type
+        renderer = get_renderer_name(effective_type)
 
     # 如果数据里显式指定了 style，覆盖模板的 style（不影响文件选择）
     if style and tpl:
