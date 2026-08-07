@@ -5,6 +5,7 @@ export interface Article {
   source_type: 'web' | 'wechat';
   direction: string;
   category: string;
+  source_category?: string;
   published_at: string;
   url: string;
   summary: string;
@@ -17,10 +18,17 @@ export interface Template {
   name: string;
   content_type: string;
   content_type_label: string;
+  category?: string;
+  category_label?: string;
   style: string;
   description: string;
   previewHtml: string;
   previewImage: string;
+}
+
+export interface CategoryInfo {
+  id: string;
+  label: string;
 }
 
 export interface UnifiedResponse {
@@ -29,6 +37,7 @@ export interface UnifiedResponse {
   scope: string;
   generated_at: string;
   stats: { web_total: number; wechat_total: number; total: number };
+  categories?: CategoryInfo[];
   articles: Article[];
 }
 

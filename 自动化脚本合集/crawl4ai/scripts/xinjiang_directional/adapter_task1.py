@@ -17,6 +17,17 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, "..", "..", ".."))
 REVIEW_INDEX = os.path.join(PROJECT_ROOT, "review", "index.json")
 OUTPUT_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, "..", "xinjiang_output"))
+# 公众号名称 -> 分类 映射表（与 server 模板配置共用）
+SELECTOR_CONFIG = os.path.join(PROJECT_ROOT, "templates", "selector_config.json")
+
+
+def load_source_categories():
+    """读取 selector_config.json 的 source_categories（公众号 -> 分类）。"""
+    try:
+        with open(SELECTOR_CONFIG, encoding="utf-8") as f:
+            return json.load(f).get("source_categories", {})
+    except Exception:
+        return {}
 
 
 def parse_pubdate(raw):
@@ -47,11 +58,15 @@ def convert_task1_index(index_path=None):
         data = json.load(f)
 
     items = data.get("items", [])
+    src_cats = load_source_categories()
     articles = []
     for it in items:
         link = it.get("link", "")
         img = html.unescape(it.get("first_image", "") or "")  # 还原 &amp; -> &
         accounts = it.get("accounts", []) or []
+        # 公众号分类：按 accounts 命中最优先的映射分类；未命中归入 other
+        account_cats = [src_cats.get(a) for a in accounts if src_cats.get(a)]
+        source_category = account_cats[0] if account_cats else "other"
         articles.append({
             "id": it.get("id", ""),                      # 保留 A01 编号，下游 Task2 可据此回查
             "title": it.get("title", "无标题"),
@@ -59,6 +74,7 @@ def convert_task1_index(index_path=None):
             "source_type": "wechat",
             "direction": "",                             # task1 无方向分类
             "category": "公众号招聘",
+            "source_category": source_category,
             "published_at": parse_pubdate(it.get("pubDate", "")),
             "url": link,
             "summary": it.get("summary", ""),

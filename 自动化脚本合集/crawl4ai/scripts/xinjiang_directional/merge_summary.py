@@ -48,6 +48,7 @@ def extract_articles(payload):
                 "source_type": "web",
                 "direction": payload.get("direction", "") if isinstance(payload.get("direction"), str) else "",
                 "category": src.get("category", ""),
+                "source_category": "recruitment",
                 "published_at": (re.search(r'(\d{4}-\d{2}-\d{2})', art.get("date", "")).group(1)
                                  if re.search(r'(\d{4}-\d{2}-\d{2})', art.get("date", "")) else ""),
                 "url": art.get("url", "#"),

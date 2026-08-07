@@ -54,26 +54,35 @@
 
 ### GET /api/articles（`app.py:135`）
 
-读 `crawl4ai/scripts/xinjiang_output/unified_articles.json` 原样返回。
+读 `crawl4ai/scripts/xinjiang_output/unified_articles.json` 返回，并为缺失 `source_category` 的文章兜底补齐（web→recruitment、wechat→other）。
 文件不存在 → 404；解析失败 → 500。
 
-### GET /api/templates（`app.py:149`）
+返回 JSON 顶层含 `categories`（分类 id→label 列表），每篇文章带 `source_category`（recruitment/agriculture/other），由爬虫/合并脚本在代码层完成分类，前端仅按该字段分组渲染。
 
-读 `templates/selector_config.json`，把每个 `content_types` 块展开成扁平列表，并附带模板 HTML 的 `body` 预览（截取前 2000 字符）：
+### GET /api/templates（`app.py:150`）
+
+读 `templates/selector_config.json`，把每个 `content_types` 块展开成扁平列表，并附带模板 HTML 的 `body` 预览（截取前 2000 字符）与分类信息：
 
 ```json
-{"code": 0, "templates": [
+{"code": 0,
+ "categories": [{"id": "recruitment", "label": "招聘类"}, {"id": "agriculture", "label": "农业类"}, {"id": "other", "label": "其他"}],
+ "templates": [
   {
     "id": "zhaopin1",
     "name": "春季招聘（清新蓝）",
     "content_type": "job_list",
     "content_type_label": "招聘岗位",
+    "category": "recruitment",
+    "category_label": "招聘类",
     "style": "blue",
     "description": "...",
-    "previewHtml": "<body 内前 2000 字符>"
+    "previewHtml": "<body 内前 2000 字符>",
+    "previewImage": "/api/tpl-preview/zhaopin1.png"
   }
 ]}
 ```
+
+`category`/`category_label` 来自模板配置或所属 content_types 块的 `category` 字段（若配置了）。
 
 ### POST /api/submit（`app.py:184`）
 

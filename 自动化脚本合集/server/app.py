@@ -145,15 +145,24 @@ def run_pipeline():
 
 # ---------------------------------------------------------------- /api/articles
 
+def _fallback_source_category(articles):
+    """兜底补齐 source_category（web -> recruitment、wechat -> other）。"""
+    for a in articles:
+        if not a.get("source_category"):
+            a["source_category"] = "recruitment" if a.get("source_type") == "web" else "other"
+    return articles
+
+
 @app.route("/api/articles", methods=["GET"])
 def articles():
     if not os.path.exists(UNIFIED_JSON):
-        return _err(f"unified_articles.json 不存在: {UNIFIED_JSON}", status=404)
+        return _err(f"unified_articles.json ������: {UNIFIED_JSON}", status=404)
     try:
         with open(UNIFIED_JSON, encoding="utf-8") as f:
             data = json.load(f)
     except Exception as e:
-        return _err(f"读取 unified_articles.json 失败: {e}", status=500)
+        return _err(f"��ȡ unified_articles.json ʧ��: {e}", status=500)
+    data["articles"] = _fallback_source_category(data.get("articles", []))
     return jsonify(data)
 
 
@@ -168,10 +177,15 @@ def templates():
         return _err(f"读取 selector_config.json 失败: {e}", status=500)
 
     out = []
+    categories = (cfg.get("categories") or {})
     for ctype, block in (cfg.get("content_types") or {}).items():
         label = block.get("label", ctype)
+        block_cat = block.get("category", "")
+        block_cat_label = categories.get(block_cat, {}).get("label", "")
         for tpl in block.get("templates", []):
             tpl_id = tpl.get("id", "")
+            tpl_cat = tpl.get("category") or block_cat
+            tpl_cat_label = categories.get(tpl_cat, {}).get("label", "")
             preview = ""
             tpl_path = os.path.join(TEMPLATES_DIR, tpl.get("file", ""))
             try:
@@ -181,7 +195,7 @@ def templates():
                 preview = (m.group(1) if m else html_text).strip()[:2000]
             except Exception as e:
                 preview = f"<!-- preview unavailable: {e} -->"
-            # 本地预览图：/api/tpl-preview/<id>.png（由 assets/gen_template_previews.py 生成）
+            # 本地预览图 /api/tpl-preview/<id>.png（assets/gen_template_previews.py 生成）
             preview_img = f"/api/tpl-preview/{tpl_id}.png"
             if not os.path.isfile(os.path.join(TEMPLATE_PREVIEWS_DIR, f"{tpl_id}.png")):
                 preview_img = ""
@@ -190,12 +204,21 @@ def templates():
                 "name": tpl.get("name", ""),
                 "content_type": ctype,
                 "content_type_label": label,
+                "category": tpl_cat,
+                "category_label": tpl_cat_label,
                 "style": tpl.get("style", ""),
                 "description": tpl.get("description", ""),
                 "previewHtml": preview,
                 "previewImage": preview_img,
             })
-    return jsonify({"code": 0, "templates": out})
+    return jsonify({
+        "code": 0,
+        "categories": [
+            {"id": cid, "label": cdef.get("label", cid)}
+            for cid, cdef in categories.items()
+        ],
+        "templates": out,
+    })
 
 
 # ---------------------------------------------------------------- /api/img（图片代理，绕过防盗链）

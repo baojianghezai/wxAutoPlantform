@@ -1,4 +1,4 @@
-import type { PushPayload, Template, UnifiedResponse } from '../types';
+import type { CategoryInfo, PushPayload, Template, UnifiedResponse } from '../types';
 
 /**
  * 后端接口说明（本地 Flask 服务，默认 http://localhost:5001，5000 被 Docker RSS 占用）：
@@ -27,12 +27,13 @@ export function getUnifiedArticles(): Promise<UnifiedResponse> {
 
 interface TemplatesResponse {
   code: number;
+  categories: CategoryInfo[];
   templates: Template[];
 }
 
-export async function getTemplates(): Promise<Template[]> {
+export async function getTemplates(): Promise<{ categories: CategoryInfo[]; templates: Template[] }> {
   const data = await request<TemplatesResponse>('/api/templates');
-  return data.templates;
+  return { categories: data.categories ?? [], templates: data.templates };
 }
 
 export async function pushDraft(payload: PushPayload): Promise<{ code: number; msg: string }> {

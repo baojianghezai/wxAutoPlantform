@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { Document, ArrowRight, ArrowLeft, Brush, View, Position } from '@element-plus/icons-vue';
-import type { Article, Template } from '../types';
+import type { Article, CategoryInfo, Template } from '../types';
 import { getUnifiedArticles, getTemplates, pushDraft } from '../api';
 import StepIndicator from '../components/StepIndicator.vue';
 import ArticleCard from '../components/ArticleCard.vue';
@@ -13,6 +13,13 @@ import PreviewPage from '../components/PreviewPage.vue';
 const currentStep = ref(1);
 const articles = ref<Article[]>([]);
 const templates = ref<Template[]>([]);
+const categories = ref<CategoryInfo[]>([
+  { id: 'recruitment', label: '招聘类' },
+  { id: 'agriculture', label: '农业类' },
+  { id: 'other', label: '其他' },
+]);
+const articleTab = ref('recruitment');
+const templateTab = ref('recruitment');
 const selectedArticleId = ref<string | null>(null);
 const selectedTemplateId = ref<string | null>(null);
 const loading = ref(false);
@@ -28,12 +35,47 @@ const selectedTemplate = computed(() =>
   templates.value.find((t) => t.id === selectedTemplateId.value) ?? null
 );
 
+const categoryOf = (c?: string) => c || 'other';
+
+const visibleArticles = computed(() =>
+  articles.value.filter((a) => categoryOf(a.source_category) === articleTab.value)
+);
+
+const visibleTemplates = computed(() =>
+  templates.value.filter((t) => categoryOf(t.category) === templateTab.value)
+);
+
+const articleCounts = computed(() => {
+  const counts: Record<string, number> = {};
+  for (const a of articles.value) {
+    const k = categoryOf(a.source_category);
+    counts[k] = (counts[k] || 0) + 1;
+  }
+  return counts;
+});
+
+const templateCounts = computed(() => {
+  const counts: Record<string, number> = {};
+  for (const t of templates.value) {
+    const k = categoryOf(t.category);
+    counts[k] = (counts[k] || 0) + 1;
+  }
+  return counts;
+});
+
 const canNextStep1 = computed(() => !!selectedArticleId.value);
 const canNextStep2 = computed(() => !!selectedArticleId.value && !!selectedTemplateId.value);
 
 // ---- 步骤切换（带滑动动画） ----
 function goToStep2() {
   if (!canNextStep1.value || navigating.value) return;
+  // 模板 Tab 跟随已选文章的分类
+  if (selectedArticle.value) {
+    const cat = categoryOf(selectedArticle.value.source_category);
+    if (templates.value.some((t) => categoryOf(t.category) === cat)) {
+      templateTab.value = cat;
+    }
+  }
   navigating.value = true;
   slideDirection.value = 'forward';
   currentStep.value = 2;
@@ -123,7 +165,10 @@ async function loadData() {
       getTemplates(),
     ]);
     articles.value = articlesData.articles;
-    templates.value = templatesData;
+    templates.value = templatesData.templates;
+    if (templatesData.categories.length) {
+      categories.value = templatesData.categories;
+    }
   } catch {
     ElMessage.error('数据加载失败');
   } finally {
@@ -207,9 +252,25 @@ onMounted(() => {
             </h2>
             <el-text type="info" size="small">共 {{ articles.length }} 篇文章，点击卡片选中</el-text>
           </div>
+
+          <el-tabs v-model="articleTab" class="category-tabs">
+            <el-tab-pane
+              v-for="cat in categories"
+              :key="cat.id"
+              :name="cat.id"
+            >
+              <template #label>
+                <span class="tab-label">{{ cat.label }}</span>
+                <el-tag size="small" type="info" effect="plain" class="tab-count">
+                  {{ articleCounts[cat.id] || 0 }}
+                </el-tag>
+              </template>
+            </el-tab-pane>
+          </el-tabs>
+
           <div class="cards-grid">
             <ArticleCard
-              v-for="article in articles"
+              v-for="article in visibleArticles"
               :key="article.id"
               :article="article"
               :selected="article.id === selectedArticleId"
@@ -217,7 +278,10 @@ onMounted(() => {
               @view-url="handleViewUrl"
             />
           </div>
-          <el-empty v-if="articles.length === 0 && !loading" description="暂无文章数据" />
+          <el-empty
+            v-if="visibleArticles.length === 0 && !loading"
+            :description="`暂无${categories.find((c) => c.id === articleTab)?.label || ''}文章`"
+          />
         </section>
 
         <!-- 第二步：选择模板 -->
@@ -229,15 +293,35 @@ onMounted(() => {
             </h2>
             <el-text type="info" size="small">已选文章：{{ selectedArticle?.title?.slice(0, 30) || '无' }}</el-text>
           </div>
+
+          <el-tabs v-model="templateTab" class="category-tabs">
+            <el-tab-pane
+              v-for="cat in categories"
+              :key="cat.id"
+              :name="cat.id"
+            >
+              <template #label>
+                <span class="tab-label">{{ cat.label }}</span>
+                <el-tag size="small" type="info" effect="plain" class="tab-count">
+                  {{ templateCounts[cat.id] || 0 }}
+                </el-tag>
+              </template>
+            </el-tab-pane>
+          </el-tabs>
+
           <div class="cards-grid template-grid">
             <TemplateCard
-              v-for="tpl in templates"
+              v-for="tpl in visibleTemplates"
               :key="tpl.id"
               :template="tpl"
               :selected="tpl.id === selectedTemplateId"
               @select="handleSelectTemplate(tpl.id)"
             />
           </div>
+          <el-empty
+            v-if="visibleTemplates.length === 0 && !loading"
+            :description="`暂无${categories.find((c) => c.id === templateTab)?.label || ''}模板`"
+          />
         </section>
 
         <!-- 第三步：预览确认 -->
@@ -364,5 +448,19 @@ onMounted(() => {
 
 .template-grid {
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+/* ---- 分类 Tab ---- */
+.category-tabs {
+  margin-bottom: 16px;
+}
+
+.tab-label {
+  font-weight: 600;
+}
+
+.tab-count {
+  margin-left: 6px;
+  font-weight: 400;
 }
 </style>

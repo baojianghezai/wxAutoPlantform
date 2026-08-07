@@ -15,6 +15,8 @@ from adapter_task1 import convert_task1_index
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, "..", "xinjiang_output"))
+PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, "..", "..", ".."))
+SELECTOR_CONFIG = os.path.join(PROJECT_ROOT, "templates", "selector_config.json")
 
 
 def load_web_articles():
@@ -53,11 +55,28 @@ def sort_key(a):
     return d if d else "0000-00-00"
 
 
+def load_categories():
+    """读取 selector_config.json 的 categories 定义（分类 id -> label）。"""
+    try:
+        with open(SELECTOR_CONFIG, encoding="utf-8") as f:
+            return json.load(f).get("categories", {})
+    except Exception:
+        return {}
+
+
+def fill_source_category(articles):
+    """兜底补齐 source_category：缺失时 web 归 recruitment、wechat 归 other。"""
+    for a in articles:
+        if not a.get("source_category"):
+            a["source_category"] = "recruitment" if a.get("source_type") == "web" else "other"
+    return articles
+
+
 def main():
     web_articles = load_web_articles()
     wechat_articles, meta = convert_task1_index()
 
-    all_articles = web_articles + wechat_articles
+    all_articles = fill_source_category(web_articles + wechat_articles)
     all_articles.sort(key=sort_key, reverse=True)
 
     # 按 id 去重（web 用 web_xxx，wechat 用 A01，天然不冲突；同名同站兜底）
@@ -80,6 +99,10 @@ def main():
             "wechat_total": len(wechat_articles),
             "total": len(deduped),
         },
+        "categories": [
+            {"id": cid, "label": cdef.get("label", cid)}
+            for cid, cdef in load_categories().items()
+        ],
         "articles": deduped,
     }
     out = os.path.join(OUTPUT_DIR, "unified_articles.json")

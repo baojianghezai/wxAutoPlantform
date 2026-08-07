@@ -1,13 +1,28 @@
 {
+  "categories": {
+    "recruitment": { "label": "招聘类" },
+    "agriculture": { "label": "农业类" },
+    "other": { "label": "其他" }
+  },
+  "source_categories": {
+    "青岛市国企招聘": "recruitment",
+    "青岛人才": "recruitment",
+    "青岛12333": "recruitment",
+    "青岛人社": "recruitment",
+    "半岛都市报即墨": "recruitment",
+    "山东华图": "recruitment"
+  },
   "content_types": {
     "job_list": {
       "label": "招聘岗位",
+      "category": "recruitment",
       "templates": [
         {
           "id": "zhaopin1",
           "name": "春季招聘（清新蓝）",
           "file": "选出来/招聘1.html",
           "style": "blue",
+          "category": "recruitment",
           "description": "蓝天白云背景，清新正式，适合综合招聘"
         },
         {
@@ -15,6 +30,7 @@
           "name": "企业招聘（纯白蓝）",
           "file": "选出来/招聘2.html",
           "style": "white_blue",
+          "category": "recruitment",
           "description": "纯白背景+蓝色点缀，适合煤矿/能源等硬核行业"
         }
       ],
@@ -23,12 +39,14 @@
     },
     "solar_term": {
       "label": "节气时令",
+      "category": "agriculture",
       "templates": [
         {
           "id": "xiaoshu",
           "name": "大暑时节",
           "file": "选出来/节气-大暑.html",
           "style": "seasonal",
+          "category": "agriculture",
           "description": "图文混排，适合节气、时令、节日内容"
         }
       ],

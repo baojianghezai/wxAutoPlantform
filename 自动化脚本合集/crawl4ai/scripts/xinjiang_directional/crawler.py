@@ -337,6 +337,9 @@ async def main():
 
     # ---------- 扁平化为前端契约格式 ----------
     direction_code, direction_short = parse_direction(direction_name)
+    # 分类下沉：web 文章按方向配置的 source_category 归类（recruitment/agriculture），
+    # 未配置时默认 recruitment（当前方向均与招聘/HR 相关）。
+    source_category = config.get("source_category", "recruitment")
     flat_articles = []
     for src in summary:
         for art in src.get("articles", []):
@@ -347,6 +350,7 @@ async def main():
                 "source_type": "web",
                 "direction": direction_short,
                 "category": src.get("category", ""),
+                "source_category": source_category,
                 "published_at": normalize_date(art.get("date", "")),
                 "url": art.get("url", "#"),
                 "summary": "",
