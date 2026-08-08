@@ -114,7 +114,7 @@ n8n 定时触发
 }
 ```
 
-`target_account` 缺省时回退旧式单账号（config.json `wechat.appid/secret` 或环境变量）。
+`target_account` 缺省时兜底顺序：前端最近一次 `/api/submit` 选定的账号（存 `server/state.json` 的 `publish_account`）→ 旧式单账号（config.json `wechat.appid/secret` 或环境变量）。n8n 即使忘记透传 `target_account`，也会发到前端刚选的账号。
 
 成功响应：`{"code": 0, "media_id": "..."}`
 失败响应：`{"code": 1, "msg": "..."}`（HTTP 500）

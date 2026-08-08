@@ -362,6 +362,12 @@ def submit():
         target_acc = next((a for a in _load_wechat_accounts() if a.get("appid")), None)
     target_name = target_acc.get("name", "") if target_acc else ""
 
+    # 记录本次选定的公众号，/api/publish 缺省 target_account 时兜底使用
+    state = _load_state()
+    state["publish_account"] = (target_acc or {}).get("id", "")
+    state["saved_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    _save_state(state)
+
     payload = {
         "article_id": article_id,
         "title": art.get("title", ""),
@@ -392,9 +398,10 @@ def publish():
         from renderers import render_article
         from publish import push_to_draft
         html = render_article(data)
+        account_id = data.get("target_account") or _load_state().get("publish_account") or None
         media_id = push_to_draft(data.get("title", ""), html,
                                  digest=data.get("digest", ""),
-                                 account_id=data.get("target_account") or None)
+                                 account_id=account_id)
     except Exception as e:
         app.logger.exception("publish failed")
         return _err(str(e), status=500)
