@@ -81,8 +81,8 @@ n8n 定时触发
 
 ```json
 {
-  "content_type": "job_list | solar_term | 其他",
-  "template_id": "可选，显式指定模板（zhaopin1/zhaopin2/xiaoshu）",
+  "content_type": "job_list | solar_term | recruitment_pilot | 其他",
+  "template_id": "可选，显式指定模板（zhaopin1/zhaopin2/xiaoshu/keji_policy）",
   "title": "公众号文章标题",
   "digest": "摘要，可选",
   "sections": [
@@ -95,9 +95,11 @@ n8n 定时触发
 }
 ```
 
-- `content_type` 决定默认模板与渲染器：`job_list`（招聘岗位）、`solar_term`（节气时令），其他值走兜底渲染。
+- `content_type` 决定默认模板与渲染器：`job_list`（招聘岗位）、`solar_term`（节气时令）、`recruitment_pilot`（科技政策招募·注入版式），其他值走兜底渲染。
 - sections 的 type 目前支持：`hero` / `cards` / `key_points` / `paragraph` / `image`，顺序任意。
 - **`template_id` 必须原样透传**：Wait② payload 中若带 `template_id`（前端运营选的模板），大模型输出必须原样带上、不得省略或修改；仅当输入无 `template_id` 时才省略（由系统按 content_type 默认模板兜底）。—— 完整字段规则见 `docs/04-大模型字段说明书.md`。
+
+**注入版式模板**（可选，运营在前端挑选）：`recruitment_pilot` 下的 `keji_policy`（科技政策招募·注入版式，对应 96 模板 24534）。该模板带自己的 `renderer: render_inject`，后端会把渲染内容替换进模板的 `<!-- INJECT_START/END -->` 区域，**保留模板头部装饰与尾部二维码**。走该模板时提示词无需特殊改动，`template_id` 原样透传 `keji_policy` 即可。
 
 ### ⑤ POST /api/publish
 
