@@ -8,6 +8,10 @@
 # ===== AI 工作日志（含凭证引用/内部网络/96 编辑器 cookie）=====
 自动化脚本合集/.workbuddy/
 
+# ===== 96微信编辑器 爬虫（.browser_profile 含登录 cookie，不入库）=====
+自动化脚本合集/crawl4ai/scripts/96weixin/.browser_profile/
+自动化脚本合集/crawl4ai/scripts/96weixin/debug_*.html
+
 # ===== Python =====
 __pycache__/
 *.py[cod]

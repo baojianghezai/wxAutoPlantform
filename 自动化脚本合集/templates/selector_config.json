@@ -52,6 +52,23 @@
       ],
       "default": "xiaoshu",
       "renderer": "render_solar_term"
+    },
+    "recruitment_pilot": {
+      "label": "科技政策招募（注入演示）",
+      "category": "recruitment",
+      "templates": [
+        {
+          "id": "keji_policy",
+          "name": "科技创新高新人才（注入版式）",
+          "file": "96_import/24534_科技创新高新人才.html",
+          "style": "tech_policy",
+          "category": "recruitment",
+          "renderer": "render_inject",
+          "description": "复用模板头部/尾部装饰，内容区由 INJECT 标记替换为岗位信息"
+        }
+      ],
+      "default": "keji_policy",
+      "renderer": "render_inject"
     }
   },
   "fallback": {

@@ -128,7 +128,7 @@ def classify_and_select(data):
     else:
         # 跨类型复用模板时，渲染器跟随模板实际归属的类型（如 xiaoshu → render_solar_term）
         effective_type = tpl.get("owner_content_type") or content_type
-        renderer = get_renderer_name(effective_type)
+        renderer = tpl.get("renderer") or get_renderer_name(effective_type)
 
     # 如果数据里显式指定了 style，覆盖模板的 style（不影响文件选择）
     if style and tpl:

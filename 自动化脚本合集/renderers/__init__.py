@@ -247,6 +247,56 @@ def render_generic(data, tpl, template_html):
     return _wrap(data, inner, accent, "job")
 
 
+def _section_imbalance(part):
+    """<section> 开闭差值（忽略自闭合标签）。"""
+    opens = len(re.findall(r"<section\b(?![^>]*?/>)", part))
+    closes = len(re.findall(r"</section>", part))
+    return opens - closes
+
+
+def _strip_leading_closes(text, n):
+    """从开头剥掉 n 个 </section>。"""
+    for _ in range(n):
+        m = re.search(r"</section>", text)
+        if not m:
+            break
+        text = text[:m.start()] + text[m.end():]
+    return text
+
+
+def render_inject(data, tpl, template_html):
+    """注入式渲染：把渲染内容替换到模板的 <!-- INJECT_START/END --> 之间。
+
+    模板其余部分（头部装饰、尾部二维码等）原样保留，实现"套版式"。
+    两个标记之间的区域应是一组完整的兄弟块（自平衡）；若不平衡则做补偿。
+    模板里没有标记时回退 render_generic。
+    """
+    marker_s = "<!-- INJECT_START -->"
+    marker_e = "<!-- INJECT_END -->"
+    i_s = template_html.find(marker_s)
+    i_e = template_html.find(marker_e)
+    if i_s < 0 or i_e < 0 or i_e <= i_s:
+        return render_generic(data, tpl, template_html)
+
+    accent = extract_accent(template_html)
+    inner = _render_sections(data, accent, "job")
+    content = f'<section class="_editor" data-role="injected">{inner}</section>'
+
+    before = template_html[:i_s]
+    region = template_html[i_s + len(marker_s):i_e]
+    after = template_html[i_e + len(marker_e):]
+
+    r = _section_imbalance(region)
+    if r < 0:
+        # 区域比开始多闭合了 |r| 个：原来由区域内闭合的标签需要补回
+        content += "</section>" * (-r)
+    elif r > 0:
+        # 区域多开了 r 个，after 开头会有 r 个孤儿闭合，剥掉
+        after = _strip_leading_closes(after, r)
+
+    return before + content + after
+
+
 def render_article(data):
     """分发入口：selector 选模板 + 渲染器名，反射调用对应渲染函数。"""
     selector = _load_selector()
