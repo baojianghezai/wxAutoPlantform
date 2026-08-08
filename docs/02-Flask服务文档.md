@@ -84,7 +84,20 @@
 
 `category`/`category_label` 来自模板配置或所属 content_types 块的 `category` 字段（若配置了）。
 
-### POST /api/submit（`app.py:184`）
+### GET /api/accounts（`app.py:169`）
+
+返回可推送的公众号账号列表（**不含 appid/secret**），供前端预览页选择目标账号：
+
+```json
+{"code": 0, "accounts": [
+  {"id": "zhaopin", "name": "青岛招聘号", "appid_masked": "wxd****1136", "configured": true},
+  {"id": "nongye", "name": "农业资讯号", "appid_masked": "", "configured": false}
+]}
+```
+
+凭证来源：项目根 `config.json` 的 `wechat.accounts`（数组，含 id/name/appid/secret，已 gitignore）。
+
+### POST /api/submit（`app.py:240`）
 
 流程：
 1. 校验 `{article_id, template_id}` 均存在，否则 400。
@@ -102,20 +115,23 @@
   "template_id": "zhaopin1",
   "template_category": "recruitment",
   "template_category_label": "招聘类",
-  "template_category_code": 1
+  "template_category_code": 1,
+  "target_account": "zhaopin",
+  "target_account_name": "青岛招聘号"
 }
 ```
 
 `template_category_code` 为模板分类数字映射（1=招聘类、2=农业类、0=其他），由 Flask 按 `template_id` 查 `selector_config.json` 的 `categories.code` 生成，n8n 可按此分支。
+`target_account`/`target_account_name` 为前端预览页选定的目标公众号（请求体 `account_id`），未传时自动取第一个已配置账号。
 
 6. POST 失败 → 502；成功 → `{"code":0,"msg":"submitted ... to waitUrl"}`。
 
-### POST /api/publish（`app.py:227`）
+### POST /api/publish（`app.py:290`）
 
-请求体 = 大模型输出的结构化 JSON（`content_type/title/digest/sections` 等）。
+请求体 = 大模型输出的结构化 JSON（`content_type/title/digest/sections/target_account` 等）。
 行为：
 1. `renderers.render_article(data)` → 渲染成公众号 HTML（选模板逻辑见 `docs/03-模板分类器文档.md`）。
-2. `publish.push_to_draft(title, html, digest)` → 推微信草稿箱，返回 `media_id`。
+2. `publish.push_to_draft(title, html, digest, account_id=target_account)` → 用**指定公众号**推微信草稿箱，返回 `media_id`。
 3. 成功 `{"code":0,"media_id":"..."}`；任何异常 → 500 `{"code":1,"msg":...}`。
 
 ### 前端静态托管（`app.py:246`）

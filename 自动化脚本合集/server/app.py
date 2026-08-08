@@ -185,6 +185,25 @@ def _template_category_code(template_id):
     }
 
 
+def _load_wechat_accounts():
+    """读取 config.json 的 wechat.accounts（含 appid/secret，仅供内部使用）。
+
+    返回 [{id, name, appid, secret}]；无 accounts 时用旧式单账号合成 default。
+    """
+    try:
+        with open(os.path.join(PROJECT_ROOT, "config.json"), encoding="utf-8") as f:
+            wc = json.load(f).get("wechat", {})
+    except Exception:
+        return []
+    accounts = wc.get("accounts") or []
+    if accounts:
+        return accounts
+    appid, secret = wc.get("appid", ""), wc.get("secret", "")
+    if appid:
+        return [{"id": "default", "name": "默认公众号", "appid": appid, "secret": secret}]
+    return []
+
+
 @app.route("/api/articles", methods=["GET"])
 def articles():
     if not os.path.exists(UNIFIED_JSON):
@@ -255,6 +274,23 @@ def templates():
     })
 
 
+# ---------------------------------------------------------------- /api/accounts（公众号账号列表，供前端选择目标）
+
+@app.route("/api/accounts", methods=["GET"])
+def accounts():
+    """返回可推送的公众号账号列表（不含 appid/secret）。
+
+    [{id, name, appid_masked}]；appid_masked 形如 wxd6****1136，便于前端识别账号。
+    """
+    out = []
+    for acc in _load_wechat_accounts():
+        appid = acc.get("appid", "")
+        masked = (appid[:3] + "****" + appid[-4:]) if len(appid) >= 7 else ("****" if appid else "")
+        out.append({"id": acc.get("id", ""), "name": acc.get("name", ""),
+                    "appid_masked": masked, "configured": bool(appid)})
+    return jsonify({"code": 0, "accounts": out})
+
+
 # ---------------------------------------------------------------- /api/img（图片代理，绕过防盗链）
 
 @app.route("/api/img", methods=["GET"])
@@ -294,6 +330,7 @@ def submit():
     data = request.get_json(silent=True) or {}
     article_id = data.get("article_id")
     template_id = data.get("template_id")
+    account_id = data.get("account_id") or ""
     if not article_id or not template_id:
         return _err("missing article_id or template_id", status=400)
 
@@ -317,6 +354,14 @@ def submit():
         return _err(str(e), status=502)
 
     cat = _template_category_code(template_id)
+    # 目标公众号：前端可选传 account_id；未传时取第一个已配置账号
+    target_acc = next((a for a in _load_wechat_accounts() if a.get("id") == account_id), None)
+    if account_id and not target_acc:
+        return _err(f"account not found: {account_id}", status=404)
+    if not target_acc:
+        target_acc = next((a for a in _load_wechat_accounts() if a.get("appid")), None)
+    target_name = target_acc.get("name", "") if target_acc else ""
+
     payload = {
         "article_id": article_id,
         "title": art.get("title", ""),
@@ -326,6 +371,8 @@ def submit():
         "template_category": cat.get("id", "other"),
         "template_category_label": cat.get("label", "其他"),
         "template_category_code": cat.get("code", 0),
+        "target_account": (target_acc or {}).get("id", ""),
+        "target_account_name": target_name,
     }
     try:
         requests.post(wait, json=payload, timeout=30)
@@ -346,7 +393,8 @@ def publish():
         from publish import push_to_draft
         html = render_article(data)
         media_id = push_to_draft(data.get("title", ""), html,
-                                 digest=data.get("digest", ""))
+                                 digest=data.get("digest", ""),
+                                 account_id=data.get("target_account") or None)
     except Exception as e:
         app.logger.exception("publish failed")
         return _err(str(e), status=500)

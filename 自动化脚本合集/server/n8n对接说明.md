@@ -57,7 +57,9 @@ n8n 定时触发
   "template_id": "zhaopin1",
   "template_category": "recruitment",
   "template_category_label": "招聘类",
-  "template_category_code": 1
+  "template_category_code": 1,
+  "target_account": "zhaopin",
+  "target_account_name": "青岛招聘号"
 }
 ```
 
@@ -70,6 +72,8 @@ n8n 定时触发
 | 0    | other / 未命中 | 其他 |
 
 > `template_category_code` 由 Flask 按 `template_id` 查模板归属分类生成，n8n 后续节点可直接按此数字做分支（如选择文案语气/封面）。
+
+**目标公众号**：`target_account`/`target_account_name` 由前端在预览页选择、经 `/api/submit` 传入。n8n 在步骤⑤ POST `/api/publish` 时需**原样透传 `target_account`**，Flask 将用该账号的 appid/secret 推送草稿。账号凭证配置在项目根 `config.json` 的 `wechat.accounts`（数组，含 id/name/appid/secret）。
 
 ### ④ n8n 大模型处理（prompt 约束）
 
@@ -97,12 +101,25 @@ n8n 定时触发
 
 ### ⑤ POST /api/publish
 
-请求体 = 大模型输出的结构化 JSON（原样 POST 即可）。
+请求体 = 大模型输出的结构化 JSON（原样 POST 即可），若 Wait② 收到过 `target_account` 需一并带上：
+
+```json
+{
+  "content_type": "job_list",
+  "template_id": "zhaopin1",
+  "title": "文章标题",
+  "digest": "摘要",
+  "sections": [...],
+  "target_account": "zhaopin"
+}
+```
+
+`target_account` 缺省时回退旧式单账号（config.json `wechat.appid/secret` 或环境变量）。
 
 成功响应：`{"code": 0, "media_id": "..."}`
 失败响应：`{"code": 1, "msg": "..."}`（HTTP 500）
 
-**注意**：推草稿箱要求运行机器的公网 IP 在公众号后台的 IP 白名单内，否则报 `errcode 40164`。凭证优先读环境变量 `WECHAT_APPID` / `WECHAT_SECRET`，回退 `config.json`。
+**注意**：推草稿箱要求运行机器的公网 IP 在**目标公众号**后台的 IP 白名单内，否则报 `errcode 40164`。凭证读取逻辑：`/api/publish` → `publish/wechat_draft.py`，按 `target_account` 查 `config.json` 的 `wechat.accounts`。
 
 ## 前端接口（ vite dev 已配置 /api 代理）
 

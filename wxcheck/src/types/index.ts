@@ -31,6 +31,13 @@ export interface CategoryInfo {
   label: string;
 }
 
+export interface WechatAccount {
+  id: string;
+  name: string;
+  appid_masked: string;
+  configured: boolean;
+}
+
 export interface UnifiedResponse {
   schema_version: string;
   source_system: string;
@@ -44,4 +51,5 @@ export interface UnifiedResponse {
 export interface PushPayload {
   articleId: string;
   templateId: string;
+  accountId?: string;
 }

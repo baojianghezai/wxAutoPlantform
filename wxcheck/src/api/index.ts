@@ -1,4 +1,4 @@
-import type { CategoryInfo, PushPayload, Template, UnifiedResponse } from '../types';
+import type { CategoryInfo, PushPayload, Template, UnifiedResponse, WechatAccount } from '../types';
 
 /**
  * 后端接口说明（本地 Flask 服务，默认 http://localhost:5001，5000 被 Docker RSS 占用）：
@@ -36,6 +36,16 @@ export async function getTemplates(): Promise<{ categories: CategoryInfo[]; temp
   return { categories: data.categories ?? [], templates: data.templates };
 }
 
+interface AccountsResponse {
+  code: number;
+  accounts: WechatAccount[];
+}
+
+export async function getAccounts(): Promise<WechatAccount[]> {
+  const data = await request<AccountsResponse>('/api/accounts');
+  return data.accounts ?? [];
+}
+
 export async function pushDraft(payload: PushPayload): Promise<{ code: number; msg: string }> {
   const data = await request<{ code: number; msg: string }>('/api/submit', {
     method: 'POST',
@@ -43,6 +53,7 @@ export async function pushDraft(payload: PushPayload): Promise<{ code: number; m
     body: JSON.stringify({
       article_id: payload.articleId,
       template_id: payload.templateId,
+      account_id: payload.accountId ?? '',
     }),
   });
   if (data.code !== 0) {

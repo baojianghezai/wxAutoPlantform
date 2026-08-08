@@ -2,8 +2,8 @@
 import { ref, computed, onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { Document, ArrowRight, ArrowLeft, Brush, View, Position } from '@element-plus/icons-vue';
-import type { Article, CategoryInfo, Template } from '../types';
-import { getUnifiedArticles, getTemplates, pushDraft } from '../api';
+import type { Article, CategoryInfo, Template, WechatAccount } from '../types';
+import { getUnifiedArticles, getTemplates, getAccounts, pushDraft } from '../api';
 import StepIndicator from '../components/StepIndicator.vue';
 import ArticleCard from '../components/ArticleCard.vue';
 import TemplateCard from '../components/TemplateCard.vue';
@@ -22,6 +22,8 @@ const articleTab = ref('recruitment');
 const templateTab = ref('recruitment');
 const selectedArticleId = ref<string | null>(null);
 const selectedTemplateId = ref<string | null>(null);
+const accounts = ref<WechatAccount[]>([]);
+const accountId = ref('');
 const loading = ref(false);
 const slideDirection = ref<'forward' | 'backward'>('forward');
 const navigating = ref(false);
@@ -121,10 +123,15 @@ function handleViewUrl(url: string) {
 
 async function handlePush() {
   if (!selectedArticleId.value || !selectedTemplateId.value) return;
+  const targetAcc = accounts.value.find((a) => a.id === accountId.value);
+  if (!targetAcc) {
+    ElMessage.warning('请选择目标公众号');
+    return;
+  }
 
   try {
     await ElMessageBox.confirm(
-      `确认推送文章「${selectedArticle.value?.title.slice(0, 30)}${(selectedArticle.value?.title.length ?? 0) > 30 ? '...' : ''}」\n使用模板「${selectedTemplate.value?.name}」至公众号草稿箱？`,
+      `确认推送文章「${selectedArticle.value?.title.slice(0, 30)}${(selectedArticle.value?.title.length ?? 0) > 30 ? '...' : ''}」\n使用模板「${selectedTemplate.value?.name}」\n推送至公众号「${targetAcc.name}」草稿箱？`,
       '推送确认',
       {
         confirmButtonText: '确认推送',
@@ -142,10 +149,12 @@ async function handlePush() {
     const res = await pushDraft({
       articleId: selectedArticleId.value,
       templateId: selectedTemplateId.value,
+      accountId: accountId.value,
     });
     console.log('[Push Payload]', {
       articleId: selectedArticleId.value,
       templateId: selectedTemplateId.value,
+      accountId: accountId.value,
       response: res,
     });
     ElMessage.success('草稿推送成功！');
@@ -160,14 +169,20 @@ async function handlePush() {
 async function loadData() {
   loading.value = true;
   try {
-    const [articlesData, templatesData] = await Promise.all([
+    const [articlesData, templatesData, accountsData] = await Promise.all([
       getUnifiedArticles(),
       getTemplates(),
+      getAccounts(),
     ]);
     articles.value = articlesData.articles;
     templates.value = templatesData.templates;
     if (templatesData.categories.length) {
       categories.value = templatesData.categories;
+    }
+    accounts.value = accountsData;
+    if (!accountId.value && accountsData.length) {
+      const first = accountsData.find((a) => a.configured) ?? accountsData[0];
+      accountId.value = first.id;
     }
   } catch {
     ElMessage.error('数据加载失败');
@@ -336,9 +351,12 @@ onMounted(() => {
           <PreviewPage
             :article="selectedArticle"
             :template="selectedTemplate"
+            :accounts="accounts"
+            :account-id="accountId"
             :loading="loading"
             @push="handlePush"
             @back="goBackToStep2"
+            @update:account-id="accountId = $event"
           />
         </section>
       </div>

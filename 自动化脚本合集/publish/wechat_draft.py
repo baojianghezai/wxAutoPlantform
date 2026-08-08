@@ -26,7 +26,7 @@ DEFAULTS = {
     "task2": {
         "tail_images_dir": "tail_images",
     },
-    "wechat": {"appid": "", "secret": ""},
+    "wechat": {"accounts": [], "appid": "", "secret": ""},
 }
 
 config = dict(DEFAULTS)
@@ -41,8 +41,32 @@ if os.path.exists(cfg_path):
 T2 = config["task2"]
 
 
-def _get_credentials():
-    """微信凭证：环境变量 WECHAT_APPID/WECHAT_SECRET 优先，回退 config.json 的 wechat 块。"""
+def _get_accounts():
+    """返回公众号凭证列表 [{id, name, appid, secret}]。
+
+    优先读 config.json 的 wechat.accounts；若为空则用旧式单账号 wechat.appid/secret
+    合成 id="default" 的账号，保证向后兼容。
+    """
+    accounts = config["wechat"].get("accounts") or []
+    if accounts:
+        return accounts
+    appid = os.environ.get("WECHAT_APPID") or config["wechat"].get("appid")
+    secret = os.environ.get("WECHAT_SECRET") or config["wechat"].get("secret")
+    if appid:
+        return [{"id": "default", "name": "默认公众号", "appid": appid, "secret": secret}]
+    return []
+
+
+def _get_credentials(account_id=None):
+    """返回指定账号 (account_id) 的 (appid, secret)。
+
+    account_id 为空时回退旧式单账号（环境变量优先，再 config.json wechat.appid/secret）。
+    """
+    if account_id:
+        for acc in _get_accounts():
+            if acc.get("id") == account_id:
+                return acc.get("appid", ""), acc.get("secret", "")
+        raise RuntimeError(f"未找到公众号账号: {account_id}")
     appid = os.environ.get("WECHAT_APPID") or config["wechat"].get("appid")
     secret = os.environ.get("WECHAT_SECRET") or config["wechat"].get("secret")
     return appid, secret
@@ -205,16 +229,18 @@ def _place_tail_blocks(content):
     return content[:idx] + "".join(blocks) + content[idx:]
 
 
-def push_to_draft(title: str, content_html: str, author: str = "", digest: str = "") -> str:
+def push_to_draft(title: str, content_html: str, author: str = "", digest: str = "",
+                  account_id: str | None = None) -> str:
     """按官方规则清洗内容并推送到草稿箱（cgi-bin/draft/add）。
 
     必填：title(≤32字) / content_html / thumb_media_id(永久封面)。
+    account_id：目标公众号 id（config.json 的 wechat.accounts），为空时回退旧式单账号。
     成功返回 media_id；失败抛 RuntimeError，异常信息带微信 errcode/响应内容。
     """
-    appid, secret = _get_credentials()
+    appid, secret = _get_credentials(account_id)
     if not (appid and secret):
         raise RuntimeError("未配置微信 appid/secret（请设置环境变量 WECHAT_APPID/WECHAT_SECRET "
-                           "或在项目根 config.json 的 wechat 块中配置）")
+                           "或在项目根 config.json 的 wechat.accounts 中配置对应账号）")
     try:
         # 1) access_token
         at = _get_access_token(appid, secret)

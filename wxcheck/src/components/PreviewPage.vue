@@ -1,16 +1,19 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import type { Article, Template } from '../types';
+import { computed, watch } from 'vue';
+import type { Article, Template, WechatAccount } from '../types';
 
 const props = defineProps<{
   article: Article | null;
   template: Template | null;
+  accounts: WechatAccount[];
+  accountId: string;
   loading: boolean;
 }>();
 
 const emit = defineEmits<{
   (e: 'push'): void;
   (e: 'back'): void;
+  (e: 'update:accountId', id: string): void;
 }>();
 
 // 模板 style 为后端返回的风格标签（字符串），预览统一使用默认配色
@@ -27,6 +30,30 @@ const articleTitle = computed(() => {
   const t = props.article.title;
   return t.length > 20 ? t.slice(0, 20) + '...' : t;
 });
+
+// 目标公众号展示：默认取第一个已配置账号
+const availableAccounts = computed(() =>
+  props.accounts.length ? props.accounts : []
+);
+
+const selectedAccount = computed(() =>
+  availableAccounts.value.find((a) => a.id === props.accountId) ?? null
+);
+
+watch(
+  () => props.accounts,
+  (list) => {
+    if (!props.accountId && list.length) {
+      const first = list.find((a) => a.configured) ?? list[0];
+      if (first) emit('update:accountId', first.id);
+    }
+  },
+  { immediate: true }
+);
+
+function handleAccountChange(id: string) {
+  emit('update:accountId', id);
+}
 
 // 外链缩略图走后端代理，避免 mmbiz 防盗链加载失败
 const thumbUrl = computed(() => {
@@ -49,6 +76,26 @@ function handleBack() {
     <div class="preview-hint" v-if="hasArticle">
       已选择 <el-text type="primary" tag="strong">{{ articleTitle }}</el-text>
       &nbsp;·&nbsp;模板：<el-text type="primary" tag="strong">{{ template?.name }}</el-text>
+    </div>
+
+    <!-- 目标公众号选择 -->
+    <div class="account-row" v-if="hasArticle">
+      <el-text size="small" class="account-label">推送至公众号：</el-text>
+      <el-select
+        :model-value="accountId"
+        placeholder="选择目标公众号"
+        size="default"
+        class="account-select"
+        @update:model-value="handleAccountChange"
+      >
+        <el-option
+          v-for="acc in availableAccounts"
+          :key="acc.id"
+          :label="acc.name + (acc.appid_masked ? `（${acc.appid_masked}）` : '')"
+          :value="acc.id"
+          :disabled="!acc.configured"
+        />
+      </el-select>
     </div>
 
     <!-- 手机模型 -->
@@ -121,9 +168,9 @@ function handleBack() {
         <el-icon class="btn-icon"><ArrowLeft /></el-icon>
         上一步
       </el-button>
-      <el-button type="primary" size="large" :loading="loading" @click="handlePush">
+      <el-button type="primary" size="large" :loading="loading" :disabled="!selectedAccount" @click="handlePush">
         <el-icon class="btn-icon"><Position /></el-icon>
-        确认推送
+        {{ selectedAccount ? `确认推送至${selectedAccount.name}` : '请选择目标公众号' }}
       </el-button>
     </div>
   </div>
@@ -143,10 +190,29 @@ function handleBack() {
   flex-shrink: 0;
   font-size: 13px;
   color: #606266;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
   padding: 8px 16px;
   background: #f5f7fa;
   border-radius: 6px;
+}
+
+.account-row {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.account-label {
+  white-space: nowrap;
+  color: #606266;
+}
+
+.account-select {
+  flex: 1;
 }
 
 .phone-stage {

@@ -53,7 +53,19 @@
     "publish_mode": "auto"
   },
   "wechat": {
-    "appid": "请填写你的公众号AppID",
-    "secret": "请填写你的公众号AppSecret（或使用环境变量 WECHAT_APPID / WECHAT_SECRET）"
+    "accounts": [
+      {
+        "id": "zhaopin",
+        "name": "青岛招聘号",
+        "appid": "请填写公众号AppID",
+        "secret": "请填写公众号AppSecret（或使用环境变量 WECHAT_APPID / WECHAT_SECRET）"
+      },
+      {
+        "id": "nongye",
+        "name": "农业资讯号",
+        "appid": "",
+        "secret": ""
+      }
+    ]
   }
 }
