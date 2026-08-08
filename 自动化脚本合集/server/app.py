@@ -153,6 +153,38 @@ def _fallback_source_category(articles):
     return articles
 
 
+def _template_category_code(template_id):
+    """根据 template_id 查模板归属分类，返回 {code, id, label}。
+
+    code 定义见 selector_config.json 的 categories（1=招聘类、2=农业类、0=其他）；
+    模板未命中时返回 {"code": 0, "id": "other", "label": "其他"}。
+    """
+    try:
+        with open(SELECTOR_CONFIG, encoding="utf-8") as f:
+            cfg = json.load(f)
+    except Exception:
+        return {"code": 0, "id": "other", "label": "其他"}
+
+    categories = cfg.get("categories") or {}
+    block_cat = ""
+    for block in (cfg.get("content_types") or {}).values():
+        for t in block.get("templates", []):
+            if t.get("id") == template_id:
+                block_cat = t.get("category") or block.get("category", "")
+                break
+        if block_cat:
+            break
+
+    if not block_cat:
+        block_cat = "other"
+    cdef = categories.get(block_cat, {})
+    return {
+        "code": cdef.get("code", 0),
+        "id": block_cat,
+        "label": cdef.get("label", block_cat),
+    }
+
+
 @app.route("/api/articles", methods=["GET"])
 def articles():
     if not os.path.exists(UNIFIED_JSON):
@@ -206,6 +238,7 @@ def templates():
                 "content_type_label": label,
                 "category": tpl_cat,
                 "category_label": tpl_cat_label,
+                "category_code": categories.get(tpl_cat, {}).get("code", 0),
                 "style": tpl.get("style", ""),
                 "description": tpl.get("description", ""),
                 "previewHtml": preview,
@@ -214,7 +247,8 @@ def templates():
     return jsonify({
         "code": 0,
         "categories": [
-            {"id": cid, "label": cdef.get("label", cid)}
+            {"id": cid, "label": cdef.get("label", cid),
+             "code": cdef.get("code", 0)}
             for cid, cdef in categories.items()
         ],
         "templates": out,
@@ -282,12 +316,16 @@ def submit():
     except Exception as e:
         return _err(str(e), status=502)
 
+    cat = _template_category_code(template_id)
     payload = {
         "article_id": article_id,
         "title": art.get("title", ""),
         "url": art.get("url", ""),
         "html": html,
         "template_id": template_id,
+        "template_category": cat.get("id", "other"),
+        "template_category_label": cat.get("label", "其他"),
+        "template_category_code": cat.get("code", 0),
     }
     try:
         requests.post(wait, json=payload, timeout=30)

@@ -1,8 +1,8 @@
 {
   "categories": {
-    "recruitment": { "label": "招聘类" },
-    "agriculture": { "label": "农业类" },
-    "other": { "label": "其他" }
+    "recruitment": { "label": "招聘类", "code": 1 },
+    "agriculture": { "label": "农业类", "code": 2 },
+    "other": { "label": "其他", "code": 0 }
   },
   "source_categories": {
     "青岛市国企招聘": "recruitment",

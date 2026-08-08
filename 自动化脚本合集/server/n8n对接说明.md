@@ -54,9 +54,22 @@ n8n 定时触发
   "title": "文章标题",
   "url": "原文链接",
   "html": "原文正文 HTML（已提取正文区域）",
-  "template_id": "zhaopin1"
+  "template_id": "zhaopin1",
+  "template_category": "recruitment",
+  "template_category_label": "招聘类",
+  "template_category_code": 1
 }
 ```
+
+**模板分类映射表**（`template_category_code`，定义见 `templates/selector_config.json` 的 `categories`）：
+
+| code | category | label |
+|------|----------|-------|
+| 1    | recruitment | 招聘类 |
+| 2    | agriculture | 农业类 |
+| 0    | other / 未命中 | 其他 |
+
+> `template_category_code` 由 Flask 按 `template_id` 查模板归属分类生成，n8n 后续节点可直接按此数字做分支（如选择文案语气/封面）。
 
 ### ④ n8n 大模型处理（prompt 约束）
 

@@ -99,9 +99,14 @@
   "title": "文章标题",
   "url": "原文链接",
   "html": "正文 HTML 片段",
-  "template_id": "zhaopin1"
+  "template_id": "zhaopin1",
+  "template_category": "recruitment",
+  "template_category_label": "招聘类",
+  "template_category_code": 1
 }
 ```
+
+`template_category_code` 为模板分类数字映射（1=招聘类、2=农业类、0=其他），由 Flask 按 `template_id` 查 `selector_config.json` 的 `categories.code` 生成，n8n 可按此分支。
 
 6. POST 失败 → 502；成功 → `{"code":0,"msg":"submitted ... to waitUrl"}`。
 
