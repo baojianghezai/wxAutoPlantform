@@ -108,6 +108,20 @@ def _font(flavor):
 
 # ---------------------------------------------------------------- sections
 
+def _capsule_heading(title, accent, flavor):
+    """公告式小节标题：accent 圆角胶囊白字 + 底部横线。"""
+    return (
+        f'<section style="margin:26px 0 14px;">'
+        f'<section style="display:inline-block;padding:7px 24px;background-color:{accent};'
+        f'border-radius:16px;">'
+        f'<p style="margin:0;font-size:16px;font-weight:bold;color:#ffffff;'
+        f'letter-spacing:1px;{_font(flavor)}">{_esc(title)}</p>'
+        f'</section>'
+        f'<section style="margin-top:6px;width:100%;height:1px;background-color:#e0e0e0;"></section>'
+        f'</section>'
+    )
+
+
 def _hero(sec, accent, flavor, tpl_style=None):
     title = _esc(sec.get("title"))
     subtitle = _esc(sec.get("subtitle"))
@@ -126,16 +140,17 @@ def _hero(sec, accent, flavor, tpl_style=None):
         parts.append('</section>')
         return "".join(parts)
 
+    # 公告式：accent 描边框引言框 + 居中大标题 + 副标题
     parts = [
-        f'<section style="margin:24px 0;padding:28px 16px;background-color:{accent};'
-        f'border-radius:8px;text-align:center;">',
-        f'<p style="margin:0;font-size:24px;font-weight:bold;color:#ffffff;'
-        f'letter-spacing:2px;{_font(flavor)}">{title}</p>',
+        f'<section style="margin:20px 0 24px;padding:18px 16px;border:2px solid {accent};'
+        f'border-radius:8px;text-align:center;background-color:#ffffff;">',
+        f'<p style="margin:0;font-size:22px;font-weight:bold;color:{accent};'
+        f'letter-spacing:2px;line-height:1.5;{_font(flavor)}">{title}</p>',
     ]
     if subtitle:
         parts.append(
-            f'<p style="margin:10px 0 0;font-size:14px;color:#ffffff;opacity:0.85;'
-            f'{_font(flavor)}">{subtitle}</p>')
+            f'<p style="margin:10px 0 0;font-size:14px;color:#666666;'
+            f'letter-spacing:1px;{_font(flavor)}">{subtitle}</p>')
     parts.append('</section>')
     return "".join(parts)
 
@@ -156,15 +171,14 @@ def _cards(sec, accent, flavor, tpl_style=None):
                           f"background-color:#ffffff;")
         block = [
             f'<section style="{card_style}">',
-            f'<p style="margin:0;font-size:17px;font-weight:bold;color:#333333;'
-            f'{_font(flavor)}"><span style="display:inline-block;width:12px;height:12px;'
-            f'background-color:{accent};border-radius:3px;margin-right:8px;'
-            f'vertical-align:1px;"></span>{_esc(item.get("title"))}</p>',
+            f'<p style="margin:0 0 10px;padding:6px 14px;display:inline-block;'
+            f'background-color:{accent};border-radius:4px;font-size:16px;font-weight:bold;'
+            f'color:#ffffff;{_font(flavor)}">{_esc(item.get("title"))}</p>',
         ]
         fields = item.get("fields") or {}
         if fields:
             rows = "".join(
-                f'<p style="margin:6px 0 0;font-size:14px;color:#555555;{_font(flavor)}">'
+                f'<p style="margin:6px 0 0;font-size:15px;color:#444444;{_font(flavor)}">'
                 f'<span style="color:{accent};font-weight:bold;">{_esc(k)}：</span>'
                 f'{_esc(v)}</p>'
                 for k, v in fields.items())
@@ -201,31 +215,75 @@ def _card_container(tpl_style, margin="20px 0"):
 
 
 def _key_points(sec, accent, flavor, tpl_style=None):
-    title = _esc(sec.get("title"))
+    title = sec.get("title")
     points = "".join(
         f'<p style="margin:8px 0;font-size:15px;color:#444444;line-height:1.7;'
         f'{_font(flavor)}"><span style="display:inline-block;width:8px;height:8px;'
         f'margin-right:8px;background-color:{accent};border-radius:50%;'
         f'vertical-align:middle;"></span>{_esc(p)}</p>'
         for p in sec.get("points", []))
-    return (
-        _card_container(tpl_style) +
-        f'<p style="margin:0 0 8px;font-size:17px;font-weight:bold;color:{accent};'
-        f'{_font(flavor)}">{title}</p>{points}</section>')
+    head = _capsule_heading(title, accent, flavor) if title else ""
+    return head + (
+        _card_container(tpl_style) + points + '</section>')
 
 
 def _paragraph(sec, accent, flavor, tpl_style=None):
     heading = sec.get("heading")
     text = _esc(sec.get("text"))
     align = "center" if flavor == "solar" else "left"
-    parts = [_card_container(tpl_style)]
-    if heading:
-        parts.append(
-            f'<p style="margin:0 0 8px;font-size:16px;font-weight:bold;color:#333333;'
-            f'text-align:{align};{_font(flavor)}">{_esc(heading)}</p>')
+    head = _capsule_heading(heading, accent, flavor) if heading else ""
+    parts = [head, _card_container(tpl_style)]
     parts.append(
-        f'<p style="margin:0;font-size:15px;color:#555555;line-height:1.8;'
+        f'<p style="margin:0;font-size:15px;color:#555555;line-height:1.9;'
         f'text-align:{align};{_font(flavor)}">{text}</p></section>')
+    return "".join(parts)
+
+
+def _timeline(sec, accent, flavor, tpl_style=None):
+    """时间轴：公告/流程类内容的"阶段节点 + 时间点"，垂直时间线卡片。
+
+    items 每项：{"time": "时间点", "label": "阶段名", "desc": "可选说明"}
+    """
+    title = sec.get("title")
+    items = sec.get("items") or []
+    if not items:
+        return ""
+    head = _capsule_heading(title, accent, flavor) if title else ""
+    parts = [head, _card_container(tpl_style)]
+    n = len(items)
+    for i, it in enumerate(items):
+        time = _esc(it.get("time"))
+        label = _esc(it.get("label"))
+        desc = _esc(it.get("desc"))
+        is_last = i == n - 1
+        line = "" if is_last else (
+            f'<span style="position:absolute;top:14px;left:5px;width:2px;'
+            f'height:calc(100% - 2px);background-color:#dddddd;"></span>')
+        node = [
+            f'<section style="display:flex;margin:0 0 6px;">',
+            f'<section style="position:relative;width:14px;flex-shrink:0;">',
+            f'<span style="display:block;position:absolute;top:3px;left:2px;'
+            f'width:10px;height:10px;background-color:{accent};border-radius:50%;"></span>',
+            line,
+            '</section>',
+            f'<section style="flex:1;padding:0 0 14px 10px;">',
+        ]
+        if time:
+            node.append(
+                f'<p style="display:inline-block;margin:0 0 4px;padding:1px 8px;'
+                f'font-size:12px;color:#ffffff;background-color:{accent};'
+                f'border-radius:10px;{_font(flavor)}">{time}</p>')
+        if label:
+            node.append(
+                f'<p style="margin:2px 0 0;font-size:15px;font-weight:bold;'
+                f'color:#333333;{_font(flavor)}">{label}</p>')
+        if desc:
+            node.append(
+                f'<p style="margin:4px 0 0;font-size:14px;color:#666666;'
+                f'line-height:1.7;{_font(flavor)}">{desc}</p>')
+        node.append('</section></section>')
+        parts.append("".join(node))
+    parts.append('</section>')
     return "".join(parts)
 
 
@@ -249,6 +307,7 @@ _SECTION_RENDERERS = {
     "key_points": _key_points,
     "paragraph": _paragraph,
     "image": _image,
+    "timeline": _timeline,
 }
 
 
@@ -270,11 +329,11 @@ def _wrap(data, inner_html, accent, flavor):
     head = ""
     if title:
         head = (
-            f'<p style="margin:0 0 4px;font-size:13px;color:#aaaaaa;text-align:center;'
-            f'{_font(flavor)}">{title}</p>')
+            f'<p style="margin:8px 0 6px;font-size:20px;font-weight:bold;color:#222222;'
+            f'text-align:center;line-height:1.5;{_font(flavor)}">{title}</p>')
     if digest:
         head += (
-            f'<p style="margin:0 0 12px;font-size:13px;color:#aaaaaa;text-align:center;'
+            f'<p style="margin:0 0 14px;font-size:13px;color:#aaaaaa;text-align:center;'
             f'{_font(flavor)}">{digest}</p>')
     return (
         f'<section style="max-width:100%;padding:8px 4px;line-height:1.8;'
@@ -284,9 +343,11 @@ def _wrap(data, inner_html, accent, flavor):
 # ---------------------------------------------------------------- renderers
 
 def render_job_list(data, tpl, template_html):
-    """招聘岗位：主题色 hero 色块 + 岗位卡片列表。"""
+    """招聘/公告类：公告式排版——引言框 hero、胶囊小节标题、白卡片正文、时间轴。"""
     accent = extract_accent(template_html)
-    inner = _render_sections(data, accent, "job")
+    inner = _render_sections(data, accent, "job",
+                             allowed={"hero", "paragraph", "cards",
+                                      "key_points", "timeline", "image"})
     return _wrap(data, inner, accent, "job")
 
 

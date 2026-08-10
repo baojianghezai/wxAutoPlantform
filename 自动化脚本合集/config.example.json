@@ -55,10 +55,16 @@
   "wechat": {
     "accounts": [
       {
-        "id": "zhaopin",
-        "name": "青岛招聘号",
+        "id": "test",
+        "name": "测试号",
         "appid": "请填写公众号AppID",
         "secret": "请填写公众号AppSecret（或使用环境变量 WECHAT_APPID / WECHAT_SECRET）"
+      },
+      {
+        "id": "zhaopin",
+        "name": "名硕人力",
+        "appid": "",
+        "secret": ""
       },
       {
         "id": "nongye",

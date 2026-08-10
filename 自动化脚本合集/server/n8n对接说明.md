@@ -82,7 +82,7 @@ n8n 定时触发
 ```json
 {
   "content_type": "job_list | solar_term | recruitment_pilot | 其他",
-  "template_id": "可选，显式指定模板（zhaopin1/zhaopin2/xiaoshu/keji_policy）",
+  "template_id": "可选，显式指定模板（zhaopin1/zhaopin2/xiaoshu/keji_policy 等）",
   "title": "公众号文章标题",
   "digest": "摘要，可选",
   "sections": [
@@ -90,16 +90,19 @@ n8n 定时触发
     {"type": "cards", "items": [{"title": "...", "fields": {"键": "值"}, "tags": ["..."], "description": "..."}]},
     {"type": "key_points", "title": "...", "points": ["...", "..."]},
     {"type": "paragraph", "heading": "可选", "text": "..."},
-    {"type": "image", "url": "...", "caption": "可选"}
+    {"type": "image", "url": "...", "caption": "可选"},
+    {"type": "timeline", "title": "招聘时间安排", "items": [{"time": "8月10日 9:00—8月14日 16:00", "label": "网上报名", "desc": "可选说明"}]}
   ]
 }
 ```
 
-- `content_type` 决定默认模板与渲染器：`job_list`（招聘岗位）、`solar_term`（节气时令）、`recruitment_pilot`（科技政策招募·注入版式），其他值走兜底渲染。
-- sections 的 type 目前支持：`hero` / `cards` / `key_points` / `paragraph` / `image`，顺序任意。
+- `content_type` 决定默认模板与渲染器：`job_list`（招聘岗位 / 招聘公告，支持 timeline 时间轴与公告式排版）、`solar_term`（节气时令）、`recruitment_pilot`（科技政策招募·注入版式），其他值走兜底渲染。
+- sections 的 type 目前支持：`hero` / `cards` / `key_points` / `paragraph` / `image` / `timeline`，顺序任意。
 - **`template_id` 必须原样透传**：Wait② payload 中若带 `template_id`（前端运营选的模板），大模型输出必须原样带上、不得省略或修改；仅当输入无 `template_id` 时才省略（由系统按 content_type 默认模板兜底）。—— 完整字段规则见 `docs/04-大模型字段说明书.md`。
 
 **注入版式模板**（可选，运营在前端挑选）：`recruitment_pilot` 下的 `keji_policy`（科技政策招募·注入版式，对应 96 模板 24534）。该模板带自己的 `renderer: render_inject`，后端会把渲染内容替换进模板的 `<!-- INJECT_START/END -->` 区域，**保留模板头部装饰与尾部二维码**。走该模板时提示词无需特殊改动，`template_id` 原样透传 `keji_policy` 即可。
+
+**招聘/公告排版**：`job_list` 下所有招聘模板（含 96 注入模板）统一输出公告式排版——引言框大标题、胶囊小节标题、白卡片正文、时间轴时间节点（`timeline` 段落）。事业单位/国企公开招聘公告（单位简介/应聘条件/报名/笔试面试等）直接按 `job_list` 组织 sections 即可，运营可在前端任意挑选模板，`template_id` 原样透传即套该模板版式（带 `INJECT` 标记的自动保留头尾装饰）。
 
 ### ⑤ POST /api/publish
 
