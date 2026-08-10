@@ -61,6 +61,39 @@ def extract_accent(template_html):
     return DEFAULT_ACCENT
 
 
+def _extract_card_style(template_html):
+    """从模板提取"内容卡"通用风格 token：底色/边框色/圆角/阴影/内边距。
+
+    扫描所有带 background-color 的 style，找同时含 border+border-radius 的组合，
+    取出现次数最多的作为卡片风格（96 模板的内容卡通常是米色底+细边框+圆角）。
+    找不到返回空 dict，调用方退化为默认样式。
+    """
+    from collections import Counter
+    combos = []
+    for m in re.finditer(r'style="([^"]*background-color:(#[0-9A-Fa-f]{6})[^"]*)"', template_html):
+        style = m.group(1)
+        border = re.search(r'border:\s*\d+px\s+solid\s+(#[0-9A-Fa-f]{6})', style)
+        radius = re.search(r'border-radius:\s*([0-9.]+px)', style)
+        if border and radius:
+            combos.append((m.group(2).lower(), border.group(1).lower(), radius.group(1).lower()))
+    if not combos:
+        return {}
+    bg, brd, rad = Counter(combos).most_common(1)[0][0]
+
+    shadow, padding = "", "16px 14px"
+    for m in re.finditer(r'style="([^"]*)"', template_html):
+        st = m.group(1)
+        if "background-color:" + bg in st:
+            sh = re.search(r'box-shadow:\s*([^;"\']+)', st)
+            if sh:
+                shadow = sh.group(1).strip()
+            pd = re.search(r'padding:\s*([^;"\']+)', st)
+            if pd:
+                padding = pd.group(1).strip()
+            break
+    return {"bg": bg, "border": brd, "radius": rad, "shadow": shadow, "padding": padding}
+
+
 # ---------------------------------------------------------------- helpers
 
 def _esc(text):
@@ -75,7 +108,7 @@ def _font(flavor):
 
 # ---------------------------------------------------------------- sections
 
-def _hero(sec, accent, flavor):
+def _hero(sec, accent, flavor, tpl_style=None):
     title = _esc(sec.get("title"))
     subtitle = _esc(sec.get("subtitle"))
     if flavor == "solar":
@@ -107,14 +140,26 @@ def _hero(sec, accent, flavor):
     return "".join(parts)
 
 
-def _cards(sec, accent, flavor):
+def _cards(sec, accent, flavor, tpl_style=None):
     out = []
     for item in sec.get("items", []):
+        if tpl_style:
+            st = tpl_style
+            card_style = (f"margin:0 0 16px;padding:{st.get('padding', '16px 14px')};"
+                          f"background-color:{st['bg']};border:1px solid {st['border']};"
+                          f"border-radius:{st['radius']};")
+            if st.get("shadow"):
+                card_style += f"box-shadow:{st['shadow']};"
+        else:
+            card_style = (f"margin:0 0 16px;padding:16px;border:1px solid #eeeeee;"
+                          f"border-left:4px solid {accent};border-radius:6px;"
+                          f"background-color:#ffffff;")
         block = [
-            f'<section style="margin:0 0 16px;padding:16px;border:1px solid #eeeeee;'
-            f'border-left:4px solid {accent};border-radius:6px;background-color:#ffffff;">',
+            f'<section style="{card_style}">',
             f'<p style="margin:0;font-size:17px;font-weight:bold;color:#333333;'
-            f'{_font(flavor)}">{_esc(item.get("title"))}</p>',
+            f'{_font(flavor)}"><span style="display:inline-block;width:12px;height:12px;'
+            f'background-color:{accent};border-radius:3px;margin-right:8px;'
+            f'vertical-align:1px;"></span>{_esc(item.get("title"))}</p>',
         ]
         fields = item.get("fields") or {}
         if fields:
@@ -142,7 +187,20 @@ def _cards(sec, accent, flavor):
     return "".join(out)
 
 
-def _key_points(sec, accent, flavor):
+def _card_container(tpl_style, margin="20px 0"):
+    """按模板风格生成内容卡容器（无模板风格时退化为普通 section）。"""
+    if not tpl_style:
+        return f'<section style="margin:{margin};">'
+    st = tpl_style
+    s = (f'margin:{margin};padding:{st.get("padding", "16px 14px")};'
+         f'background-color:{st["bg"]};border:1px solid {st["border"]};'
+         f'border-radius:{st["radius"]};')
+    if st.get("shadow"):
+        s += f'box-shadow:{st["shadow"]};'
+    return f'<section style="{s}">'
+
+
+def _key_points(sec, accent, flavor, tpl_style=None):
     title = _esc(sec.get("title"))
     points = "".join(
         f'<p style="margin:8px 0;font-size:15px;color:#444444;line-height:1.7;'
@@ -151,16 +209,16 @@ def _key_points(sec, accent, flavor):
         f'vertical-align:middle;"></span>{_esc(p)}</p>'
         for p in sec.get("points", []))
     return (
-        f'<section style="margin:24px 0;">'
+        _card_container(tpl_style) +
         f'<p style="margin:0 0 8px;font-size:17px;font-weight:bold;color:{accent};'
         f'{_font(flavor)}">{title}</p>{points}</section>')
 
 
-def _paragraph(sec, accent, flavor):
+def _paragraph(sec, accent, flavor, tpl_style=None):
     heading = sec.get("heading")
     text = _esc(sec.get("text"))
     align = "center" if flavor == "solar" else "left"
-    parts = ['<section style="margin:20px 0;">']
+    parts = [_card_container(tpl_style)]
     if heading:
         parts.append(
             f'<p style="margin:0 0 8px;font-size:16px;font-weight:bold;color:#333333;'
@@ -171,7 +229,7 @@ def _paragraph(sec, accent, flavor):
     return "".join(parts)
 
 
-def _image(sec, accent, flavor):
+def _image(sec, accent, flavor, tpl_style=None):
     url = _esc(sec.get("url"))
     caption = sec.get("caption")
     parts = [
@@ -194,7 +252,7 @@ _SECTION_RENDERERS = {
 }
 
 
-def _render_sections(data, accent, flavor, allowed=None):
+def _render_sections(data, accent, flavor, allowed=None, tpl_style=None):
     body = []
     for sec in data.get("sections", []):
         stype = sec.get("type")
@@ -202,7 +260,7 @@ def _render_sections(data, accent, flavor, allowed=None):
             continue
         fn = _SECTION_RENDERERS.get(stype)
         if fn:
-            body.append(fn(sec, accent, flavor))
+            body.append(fn(sec, accent, flavor, tpl_style))
     return "".join(body)
 
 
@@ -279,7 +337,8 @@ def render_inject(data, tpl, template_html):
         return render_generic(data, tpl, template_html)
 
     accent = extract_accent(template_html)
-    inner = _render_sections(data, accent, "job")
+    tpl_style = _extract_card_style(template_html)
+    inner = _render_sections(data, accent, "job", tpl_style=tpl_style)
     content = f'<section class="_editor" data-role="injected">{inner}</section>'
 
     before = template_html[:i_s]
