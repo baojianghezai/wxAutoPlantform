@@ -365,6 +365,7 @@ def submit():
     # 记录本次选定的公众号，/api/publish 缺省 target_account 时兜底使用
     state = _load_state()
     state["publish_account"] = (target_acc or {}).get("id", "")
+    state["publish_template_id"] = template_id
     state["saved_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     _save_state(state)
 
@@ -397,6 +398,9 @@ def publish():
     try:
         from renderers import render_article
         from publish import push_to_draft
+        # 前端 /api/submit 选定的模板兜底：n8n 大模型若丢了 template_id 也能套上
+        if not data.get("template_id"):
+            data["template_id"] = _load_state().get("publish_template_id")
         html = render_article(data)
         account_id = data.get("target_account") or _load_state().get("publish_account") or None
         media_id = push_to_draft(data.get("title", ""), html,
