@@ -69,6 +69,29 @@
       ],
       "default": "keji_policy",
       "renderer": "render_inject"
+    },
+    "inject_templates": {
+      "label": "注入版式模板库（96 模板）",
+      "category": "recruitment",
+      "templates": [
+        { "id": "police_day", "name": "服务人民中国人民警察节", "file": "96_import/23475_服务人民中国人民警察节.html", "style": "inject", "category": "recruitment", "renderer": "render_inject", "description": "警察节主题头尾装饰" },
+        { "id": "digital_gov", "name": "数字政府智慧城市人工智能", "file": "96_import/24197_数字政府智慧城市人工智能.html", "style": "inject", "category": "recruitment", "renderer": "render_inject", "description": "数字科技主题" },
+        { "id": "early_summer", "name": "初夏时节绿色清新", "file": "96_import/24366_初夏时节绿色排版清新自然.html", "style": "inject", "category": "recruitment", "renderer": "render_inject", "description": "清新自然版式" },
+        { "id": "ai_sports", "name": "AI智能体探索前沿", "file": "96_import/24507_AI智能体探索前沿智启未来.html", "style": "inject", "category": "recruitment", "renderer": "render_inject", "description": "科技智能主题" },
+        { "id": "summer_notice", "name": "暑假放假校园通知", "file": "96_import/24620_暑期放假校园通知.html", "style": "inject", "category": "recruitment", "renderer": "render_inject", "description": "校园通知版式" },
+        { "id": "robot_contest", "name": "高校赛事机器人大赛", "file": "96_import/24624_高校赛事机器人大赛.html", "style": "inject", "category": "recruitment", "renderer": "render_inject", "description": "赛事活动版式" },
+        { "id": "family_edu", "name": "家庭教育培训招生简章", "file": "96_import/24667_家庭教育培训招生简章.html", "style": "inject", "category": "recruitment", "renderer": "render_inject", "description": "招生培训版式" },
+        { "id": "summer_camp", "name": "暑假实训招生宣传", "file": "96_import/24688_暑期实训招生宣传培训班.html", "style": "inject", "category": "recruitment", "renderer": "render_inject", "description": "招生宣传版式" },
+        { "id": "two_sessions", "name": "全国两会精神解读专题", "file": "96_import/24770_全国两会精神解读学习专栏建党节.html", "style": "inject", "category": "recruitment", "renderer": "render_inject", "description": "党建专题版式" },
+        { "id": "corp_news", "name": "企业新闻发展战略升级", "file": "96_import/24909_企业新闻企业发展战略升级.html", "style": "inject", "category": "recruitment", "renderer": "render_inject", "description": "企业新闻版式" },
+        { "id": "beach_travel", "name": "夏日旅游海滩度假", "file": "96_import/24937_夏日旅游海滩度假橘子海落日.html", "style": "inject", "category": "recruitment", "renderer": "render_inject", "description": "旅游度假版式" },
+        { "id": "disaster_flyer", "name": "自然灾害防范高温防暑", "file": "96_import/24986_自然灾害防范高温防暑.html", "style": "inject", "category": "recruitment", "renderer": "render_inject", "description": "安全宣传版式" },
+        { "id": "science_camp", "name": "暑假科研探索营", "file": "96_import/24997_暑期科研探索营.html", "style": "inject", "category": "recruitment", "renderer": "render_inject", "description": "科研营招生版式" },
+        { "id": "army_day", "name": "建军节红色传承强军梦", "file": "96_import/25060_建军节红色传承强军梦.html", "style": "inject", "category": "recruitment", "renderer": "render_inject", "description": "建军节主题版式" },
+        { "id": "fc_summit", "name": "国际展会交流峰会科技", "file": "96_import/24848_国际展会交流峰会科技.html", "style": "inject", "category": "recruitment", "renderer": "render_inject", "description": "会展峰会版式" }
+      ],
+      "default": "keji_policy",
+      "renderer": "render_inject"
     }
   },
   "fallback": {
