@@ -40,7 +40,7 @@ except ImportError:  # 直接以脚本方式运行（python server/app.py）
 
 STATE_FILE = os.path.join(BASE, "state.json")
 UNIFIED_JSON = os.path.join(PROJECT_ROOT, "crawl4ai", "scripts",
-                            "xinjiang_output", "unified_articles.json")
+                            "shandong_official", "shandong_output", "unified_articles.json")
 TEMPLATES_DIR = os.path.join(PROJECT_ROOT, "templates")
 SELECTOR_CONFIG = os.path.join(TEMPLATES_DIR, "selector_config.json")
 # 模板本地预览图目录（由 assets/gen_template_previews.py 生成）

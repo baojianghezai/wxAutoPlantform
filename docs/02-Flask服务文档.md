@@ -54,7 +54,7 @@
 
 ### GET /api/articles（`app.py:135`）
 
-读 `crawl4ai/scripts/xinjiang_output/unified_articles.json` 返回，并为缺失 `source_category` 的文章兜底补齐（web→recruitment、wechat→other）。
+读 `crawl4ai/scripts/shandong_official/shandong_output/unified_articles.json` 返回，并为缺失 `source_category` 的文章兜底补齐（web→recruitment、wechat→other）。
 文件不存在 → 404；解析失败 → 500。
 
 返回 JSON 顶层含 `categories`（分类 id→label 列表），每篇文章带 `source_category`（recruitment/agriculture/other），由爬虫/合并脚本在代码层完成分类，前端仅按该字段分组渲染。
@@ -142,13 +142,12 @@
 
 ### server/pipeline.py —— 爬虫流水线
 
-`run_all(log_fn) -> {"code":0|1, "msg", "stats"}`，5 步：
+`run_all(log_fn) -> {"code":0|1, "msg", "stats"}`，4 步：
 
 1. **task1_index.py**：抓公众号 RSS 信源 → `review/index.json`；先备份 `index.backup.json`，若新产出 0 条且备份非空则还原（防 RSS 不可达清空信源）。
-2. **分方向爬虫**：`crawl4ai/scripts/xinjiang_directional/crawler.py --config config_*.json`，对每个 config 跑子进程（单方向失败不中断，记 `failed_directions`；超时 900s）。
-3. **merge_summary.py**：合并各方向输出。
-4. **adapter_task1.py**：`review/index.json` → 统一 articles 契约。
-5. **combine.py**：web + wechat 合并去重 → `xinjiang_output/unified_articles.json`。
+2. **山东官方招聘爬虫**：`crawl4ai/scripts/shandong_official/shandong_official_crawler.py --config sources_config.json`（52 个省级+16地市人社/教育/卫健委招聘页，JS 渲染；超时 1800s）。
+3. **adapter_task1.py**：`review/index.json` → 统一 articles 契约。
+4. **combine.py**：web（山东爬虫）+ wechat 合并去重 → `shandong_output/unified_articles.json`。
 
 说明：
 - 爬虫依赖 crawl4ai，`_find_crawl_python()` 按候选顺序探测解释器（`python` / `py -3.13` / `py -3` / 当前解释器）。
@@ -174,7 +173,7 @@
 | 常量 | 路径 |
 |------|------|
 | `STATE_FILE` | `server/state.json` |
-| `UNIFIED_JSON` | `crawl4ai/scripts/xinjiang_output/unified_articles.json` |
+| `UNIFIED_JSON` | `crawl4ai/scripts/shandong_official/shandong_output/unified_articles.json` |
 | `TEMPLATES_DIR` | `templates/` |
 | `SELECTOR_CONFIG` | `templates/selector_config.json` |
 | `FRONTEND_DIST` | `../wxcheck/dist` |

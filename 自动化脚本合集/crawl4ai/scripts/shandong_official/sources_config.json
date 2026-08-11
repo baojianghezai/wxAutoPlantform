@@ -1,0 +1,476 @@
+{
+  "source_system": "shandong_official",
+  "description": "山东官方招聘网站（人社/教育/卫健委，省级+16地市），来源：官方招聘网站.docx",
+  "max_concurrent": 3,
+  "source_category": "recruitment",
+  "sources": [
+    {
+      "name": "山东省人社厅-省属事业单位公开招聘服务平台",
+      "url": "https://hrss.shandong.gov.cn/channels/ch00232/",
+      "group": "省级官方平台",
+      "category": "province",
+      "sub": "",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "山东人事考试信息网",
+      "url": "https://hrss.shandong.gov.cn/rsks/channels/ch03577/",
+      "group": "省级官方平台",
+      "category": "province",
+      "sub": "",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "山东省卫生健康委员会（委属单位招聘）",
+      "url": "http://wsjkw.shandong.gov.cn/zwgk/fdzdgknr/zkly/wsdw/index_7179_1.html",
+      "group": "省级官方平台",
+      "category": "province",
+      "sub": "",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "山东省卫健委医疗管理服务中心报名系统",
+      "url": "http://www.sdygzx.cn/tzgg/",
+      "group": "省级官方平台",
+      "category": "province",
+      "sub": "",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "济南市",
+      "url": "https://jnhrss.jinan.gov.cn/api-gateway/jpaas-jsearch-web-server/search?q=%E6%8B%9B%E8%81%98&serviceId=kCIvy0kKaIxJTcKwDuf2L&pagemode=result&appid=&webid=&websiteid=&tpl=&style=&ck=o&pos=title%2Ccontent",
+      "group": "16地人社局",
+      "category": "city",
+      "sub": "rsj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "青岛市",
+      "url": "http://www.qingdao.gov.cn/unionsearch/?searchWord=%E6%8B%9B%E8%81%98&sitetype=all&areaId=20",
+      "group": "16地人社局",
+      "category": "city",
+      "sub": "rsj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "淄博市",
+      "url": "https://hrss.zibo.gov.cn/jsearchfront/search.do?websiteid=370300000000009&tpl=123&q=%E6%8B%9B%E8%81%98&webid=50&cateid=1&pos=title%2Ccontent&x=0&y=0",
+      "group": "16地人社局",
+      "category": "city",
+      "sub": "rsj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "枣庄市",
+      "url": "http://zzhrss.zaozhuang.gov.cn/irs-c-web/search.shtml?code=18e33439bb9&dataTypeId=66&searchWord=%E6%8B%9B%E8%81%98",
+      "group": "16地人社局",
+      "category": "city",
+      "sub": "rsj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "东营市",
+      "url": "http://dylss.dongying.gov.cn/jsearchfront/search.do?q=%E6%8B%9B%E8%81%98&websiteid=370500000000047&pg=&p=1&tpl=234&category=&submit=%E6%90%9C%E7%B4%A2",
+      "group": "16地人社局",
+      "category": "city",
+      "sub": "rsj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "烟台市",
+      "url": "https://rshj.yantai.gov.cn/api-gateway/jpaas-jsearch-web-server/search?serviceId=86p0WSXKwTulffZ6Pesl3&cateid=&q=%E6%8B%9B%E8%81%98",
+      "group": "16地人社局",
+      "category": "city",
+      "sub": "rsj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "潍坊市",
+      "url": "http://rsj.weifang.gov.cn",
+      "group": "16地人社局",
+      "category": "city",
+      "sub": "rsj",
+      "enabled": true,
+      "note": "docx原URL为机构导航页，改为人社局首页"
+    },
+    {
+      "name": "济宁市",
+      "url": "https://hrss.jining.gov.cn/jsearchfront/search.do?q=%E6%8B%9B%E8%81%98&websiteid=370800000000051&pos=title%2Ccontent&tpl=68",
+      "group": "16地人社局",
+      "category": "city",
+      "sub": "rsj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "泰安市",
+      "url": "https://rsj.taian.gov.cn/jsearchfront/search.do?q=%E6%8B%9B%E8%81%98&websiteid=370900000000013&tpl=312&ck=0&pos=title%2Ccontent&x=0&y=0",
+      "group": "16地人社局",
+      "category": "city",
+      "sub": "rsj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "威海市",
+      "url": "https://www.weihai.gov.cn/jsearchfront/search.do?websiteid=371000001100000&tpl=1262&q=%E6%8B%9B%E8%81%98",
+      "group": "16地人社局",
+      "category": "city",
+      "sub": "rsj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "日照市",
+      "url": "https://hrss.rizhao.gov.cn/jsearchfront/search.do?q=%E6%8B%9B%E7%89%8C&websiteid=371100000000030&tpl=346",
+      "group": "16地人社局",
+      "category": "city",
+      "sub": "rsj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "临沂市",
+      "url": "https://rsj.linyi.gov.cn/aop_views/search/modules/resultpc/soso.html?query=eyJrZXlXb3JkIjoi5oub6IGYIiwib3duZXIiOiIxNDMxNTUxNjEwIiwidG9rZW4iOiJ0b3VyaXN0IiwidXJsUHJlZml4IjoiL2FvcF9jb21wb25lbnQvIiwibGFuZyI6ImkxOG5femhfQ04ifQ==",
+      "group": "16地人社局",
+      "category": "city",
+      "sub": "rsj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "德州市",
+      "url": "https://www.dezhou.gov.cn/irs-c-web/search.shtml?code=18bf4db5dab&dataTypeId=1026&searchWord=%E6%8B%9B%E8%81%98&x=49&y=13",
+      "group": "16地人社局",
+      "category": "city",
+      "sub": "rsj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "聊城市",
+      "url": "http://rsj.liaocheng.gov.cn/search.html?keyword=%E6%8B%9B%E8%81%98",
+      "group": "16地人社局",
+      "category": "city",
+      "sub": "rsj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "滨州市",
+      "url": "http://rs.binzhou.gov.cn/jsearchfront/search.do?websiteid=371600000010000&tpl=2931&pagemode=result&appid=all&style=1&ck=0&pos=title%2Ccontent%2C_default_search&od=0&q=%E6%8B%9B%E8%81%98&x=0&y=0",
+      "group": "16地人社局",
+      "category": "city",
+      "sub": "rsj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "菏泽市",
+      "url": "http://hzrsj.heze.gov.cn/jiansuo/?keyword=%E6%8B%9B%E8%81%98",
+      "group": "16地人社局",
+      "category": "city",
+      "sub": "rsj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "济南市教育局",
+      "url": "https://jnedu.jinan.gov.cn/api-gateway/jpaas-jsearch-web-server/search?serviceId=hJ3puR9YLF8O5XjZMJ5jI&q=%E6%8B%9B%E8%81%98",
+      "group": "16市教育局",
+      "category": "city",
+      "sub": "edu",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "青岛市教育局",
+      "url": "http://www.qingdao.gov.cn/unionsearch/?searchWord=%E6%8B%9B%E8%81%98&sitetype=all&areaId=15",
+      "group": "16市教育局",
+      "category": "city",
+      "sub": "edu",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "淄博市教育局",
+      "url": "https://edu.zibo.gov.cn/jsearchfront/search.do?websiteid=370300000000002&tpl=90&q=%E6%8B%9B%E8%81%98&webid=4&cateid=1&pos=title%2Ccontent&x=0&y=0",
+      "group": "16市教育局",
+      "category": "city",
+      "sub": "edu",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "枣庄市教育局",
+      "url": "http://edu.zaozhuang.gov.cn/irs-c-web/search.shtml?code=18e3343bc50&dataTypeId=75&searchWord=%E6%8B%9B%E8%81%98",
+      "group": "16市教育局",
+      "category": "city",
+      "sub": "edu",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "东营市教育局",
+      "url": "http://dyjy.dongying.gov.cn/jsearchfront/search.do?q=%E6%8B%9B%E8%81%98&websiteid=370500000000039&pg=&p=1&tpl=226&category=&submit=",
+      "group": "16市教育局",
+      "category": "city",
+      "sub": "edu",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "烟台市教育局",
+      "url": "https://jyj.yantai.gov.cn/api-gateway/jpaas-jsearch-web-server/search?serviceId=WQ6fvBJIsVEqe1sN6miqt&appid=1&q=%E6%8B%9B%E8%81%98&pg=12&style=&ck=0&pos=title%2Ccontent",
+      "group": "16市教育局",
+      "category": "city",
+      "sub": "edu",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "潍坊市教育局",
+      "url": "https://jyj.weifang.gov.cn/jiansuo/?keyword=%E6%8B%9B%E8%81%98",
+      "group": "16市教育局",
+      "category": "city",
+      "sub": "edu",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "济宁市教育局",
+      "url": "https://jnjy.jining.gov.cn/jsearchfront/search.do?q=%E6%8B%9B%E8%81%98&websiteid=370800000000044&pos=title%2Ccontent&tpl=62",
+      "group": "16市教育局",
+      "category": "city",
+      "sub": "edu",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "泰安市教育局",
+      "url": "https://jyj.taian.gov.cn/jsearchfront/search.do?q=%E6%8B%9B%E8%81%98&websiteid=370900000000003&tpl=290&imgbtn.x=10&imgbtn.y=12",
+      "group": "16市教育局",
+      "category": "city",
+      "sub": "edu",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "威海市教育局",
+      "url": "https://jyj.weihai.gov.cn/jsearchfront/search.do?q=%E6%8B%9B%E8%81%98&websiteid=371000004300000&tpl=1141",
+      "group": "16市教育局",
+      "category": "city",
+      "sub": "edu",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "日照市教育局",
+      "url": "http://jyj.rizhao.gov.cn/jsearchfront/search.do?q=%E6%8B%9B%E8%81%98&websiteid=371100000000032&tpl=333",
+      "group": "16市教育局",
+      "category": "city",
+      "sub": "edu",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "临沂市教育局",
+      "url": "https://jyj.linyi.gov.cn/aop_views/search/modules/resultpc/soso.html?query=eyJrZXlXb3JkIjoi5oub6IGYIiwib3duZXIiOiIxMzc4MDg1NjgwIiwidG9rZW4iOiJ0b3VyaXN0IiwidXJsUHJlZml4IjoiL2FvcF9jb21wb25lbnQvIiwibGFuZyI6ImkxOG5femhfQ04ifQ==",
+      "group": "16市教育局",
+      "category": "city",
+      "sub": "edu",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "德州市教育局",
+      "url": "https://www.dezhou.gov.cn/irs-c-web/search.shtml?code=18bf4dbe422&dataTypeId=1072&searchWord=%E6%8B%9B%E8%81%98&x=0&y=0",
+      "group": "16市教育局",
+      "category": "city",
+      "sub": "edu",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "聊城市教育局",
+      "url": "http://jyty.liaocheng.gov.cn/search.html?keyword=%E6%8B%9B%E8%81%98",
+      "group": "16市教育局",
+      "category": "city",
+      "sub": "edu",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "滨州市教育局",
+      "url": "http://jy.binzhou.gov.cn/jsearchfront/search.do?websiteid=371600000003000&tpl=2924&pagemode=result&appid=all&style=1&ck=0&pos=title%2Ccontent%2C_default_search&od=0&q=%E6%8B%9B%E8%81%98&x=0&y=0",
+      "group": "16市教育局",
+      "category": "city",
+      "sub": "edu",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "菏泽市教育局",
+      "url": "http://hzjy.heze.gov.cn/jiansuo/?keyword=%E6%8B%9B%E8%81%98",
+      "group": "16市教育局",
+      "category": "city",
+      "sub": "edu",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "济南市卫健委",
+      "url": "https://jnmhc.jinan.gov.cn/api-gateway/jpaas-jsearch-web-server/search?serviceId=y75i3doGOStwgTl6lJLfR&pagemode=result&appid=1&tpl=1678&ck=0&pos=title%2Ccontent&q=%E6%8B%9B%E8%81%98",
+      "group": "16市卫健委",
+      "category": "city",
+      "sub": "wjw",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "青岛市卫健委",
+      "url": "http://www.qingdao.gov.cn/unionsearch/?searchWord=%E6%8B%9B%E8%81%98&sitetype=all&areaId=33",
+      "group": "16市卫健委",
+      "category": "city",
+      "sub": "wjw",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "淄博市卫健委",
+      "url": "https://ws.zibo.gov.cn/jsearchfront/search.do?websiteid=370300000000018&tpl=108&q=%E6%8B%9B%E8%81%98&webid=34&cateid=1&pos=title%2Ccontent&x=0&y=0",
+      "group": "16市卫健委",
+      "category": "city",
+      "sub": "wjw",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "枣庄市卫健委",
+      "url": "http://wsjkw.zaozhuang.gov.cn/gzdt/qsdt/",
+      "group": "16市卫健委",
+      "category": "city",
+      "sub": "wjw",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "东营市卫健委",
+      "url": "http://dywsjk.dongying.gov.cn/jsearchfront/search.do?q=%E6%8B%9B%E8%81%98&websiteid=370500000000056&pg=&p=1&tpl=244&category=&submit=",
+      "group": "16市卫健委",
+      "category": "city",
+      "sub": "wjw",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "烟台市卫健委",
+      "url": "https://wjw.yantai.gov.cn/api-gateway/jpaas-jsearch-web-server/search?search=%E6%9C%AC%E7%AB%99&q=%E6%8B%9B%E8%81%98&serviceId=EH5eMd5yKRjmdbxqdMeNM&cateid=",
+      "group": "16市卫健委",
+      "category": "city",
+      "sub": "wjw",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "潍坊市卫健委",
+      "url": "http://wsjkw.weifang.gov.cn/wjwlist/?pid=trs1309392",
+      "group": "16市卫健委",
+      "category": "city",
+      "sub": "wjw",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "济宁市卫健委",
+      "url": "https://wjw.jining.gov.cn/jsearchfront/search.do?q=%E6%8B%9B%E8%81%98&websiteid=370800000000005&pos=title%2Ccontent&tpl=11",
+      "group": "16市卫健委",
+      "category": "city",
+      "sub": "wjw",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "泰安市卫健委",
+      "url": "https://wjw.taian.gov.cn/jsearchfront/search.do?websiteid=370900000000026&searchid=5742&pg=&p=1&tpl=297&cateid=15982&total=&q=%E6%8B%9B%E8%81%98&pq=&oq=&eq=&pos=title%2Ccontent&begin=&end=",
+      "group": "16市卫健委",
+      "category": "city",
+      "sub": "wjw",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "威海市卫健委",
+      "url": "https://wsjkw.weihai.gov.cn/jsearchfront/search.do?websiteid=371000004900000&tpl=1222&q=%E6%8B%9B%E8%81%98",
+      "group": "16市卫健委",
+      "category": "city",
+      "sub": "wjw",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "日照市卫健委",
+      "url": "http://wsjkw.rizhao.gov.cn/jsearchfront/search.do?websiteid=371100000000001&tpl=370&x=0&y=0&q=%E6%8B%9B%E8%81%98",
+      "group": "16市卫健委",
+      "category": "city",
+      "sub": "wjw",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "临沂市卫健委",
+      "url": "https://wsjsw.linyi.gov.cn/aop_views/search/modules/resultpc/soso.html?query=eyJrZXlXb3JkIjoi5oub6IGYIiwib3duZXIiOiIxNDMxNTgyMTcwIiwidG9rZW4iOiJ0b3VyaXN0IiwidXJsUHJlZml4IjoiL2FvcF9jb21wb25lbnQvIiwibGFuZyI6ImkxOG5femhfQ04ifQ==",
+      "group": "16市卫健委",
+      "category": "city",
+      "sub": "wjw",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "德州市卫健委",
+      "url": "https://www.dezhou.gov.cn/irs-c-web/search.shtml?code=18bf4daae1c&dataTypeId=928&searchWord=%E6%8B%9B%E8%81%98&searchscope=title",
+      "group": "16市卫健委",
+      "category": "city",
+      "sub": "wjw",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "聊城市卫健委",
+      "url": "http://wjw.liaocheng.gov.cn/search.html?keyword=%E6%8B%9B%E8%81%98",
+      "group": "16市卫健委",
+      "category": "city",
+      "sub": "wjw",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "滨州市卫健委",
+      "url": "http://wjw.binzhou.gov.cn/jsearchfront/search.do?websiteid=371600000020000&tpl=2950&pagemode=result&appid=all&style=1&ck=0&pos=title%2Ccontent%2C_default_search&od=0&q=%E6%8B%9B%E8%81%98&x=24&y=21",
+      "group": "16市卫健委",
+      "category": "city",
+      "sub": "wjw",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "菏泽市卫健委",
+      "url": "http://hzswsjkw.heze.gov.cn/jiansuo/?keyword=%E6%8B%9B%E8%81%98",
+      "group": "16市卫健委",
+      "category": "city",
+      "sub": "wjw",
+      "enabled": true,
+      "note": ""
+    }
+  ]
+}

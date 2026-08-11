@@ -47,9 +47,8 @@ npm-debug.log*
 # ===== 爬虫抓取产物（可由脚本重新生成）=====
 自动化脚本合集/review/index.html
 自动化脚本合集/review/index.json
-自动化脚本合集/crawl4ai/scripts/xinjiang_output/
-自动化脚本合集/crawl4ai/scripts/xinjiang_directional/xinjiang_output/
-自动化脚本合集/crawl4ai/scripts/xinjiang_directional/__pycache__/
+自动化脚本合集/crawl4ai/scripts/shandong_official/shandong_output/
+自动化脚本合集/crawl4ai/scripts/shandong_official/__pycache__/
 自动化脚本合集/_archive/crawl4ai_scripts/court_output/
 
 # ===== 系统 / 编辑器 =====

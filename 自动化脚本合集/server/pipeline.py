@@ -12,10 +12,8 @@
 - 单方向爬虫失败不中断，记入 failed_directions。
 - 日志写 server/pipeline.log，同时转发给 log_fn（若有）。
 """
-import glob
 import json
 import os
-import re
 import shutil
 import subprocess
 import sys
@@ -24,13 +22,13 @@ from datetime import datetime
 BASE = os.path.dirname(os.path.abspath(__file__))          # server/
 PROJECT_ROOT = os.path.dirname(BASE)                        # 自动化脚本合集/
 CRAWL_SCRIPTS = os.path.join(PROJECT_ROOT, "crawl4ai", "scripts")
-DIRECTIONAL_DIR = os.path.join(CRAWL_SCRIPTS, "xinjiang_directional")
-OUTPUT_DIR = os.path.join(CRAWL_SCRIPTS, "xinjiang_output")
+SHANDONG_DIR = os.path.join(CRAWL_SCRIPTS, "shandong_official")
+OUTPUT_DIR = os.path.join(SHANDONG_DIR, "shandong_output")
 UNIFIED_JSON = os.path.join(OUTPUT_DIR, "unified_articles.json")
 LOG_FILE = os.path.join(BASE, "pipeline.log")
 
 # 单方向爬虫子进程超时（秒）
-CRAWL_TIMEOUT = 900
+CRAWL_TIMEOUT = 1800
 
 
 def _make_logger(log_fn):
@@ -98,20 +96,6 @@ def _run(cmd, cwd, log, timeout=None):
     return proc.returncode
 
 
-def _direction_output_name(cfg_path):
-    """从配置的 direction_name（如 '子方向1：劳动法规解读'）推导输出文件名主干
-    '子方向1_劳动法规解读'；解析失败则回退用 config 文件名。"""
-    try:
-        with open(cfg_path, encoding="utf-8") as f:
-            name = json.load(f).get("direction_name", "")
-        name = re.sub(r"[：:/\\]", "_", name).strip()
-        if name:
-            return name
-    except Exception:
-        pass
-    return os.path.splitext(os.path.basename(cfg_path))[0]
-
-
 def run_all(log_fn=None):
     log = _make_logger(log_fn)
     log("=" * 60)
@@ -130,7 +114,7 @@ def run_all(log_fn=None):
     review_backup = os.path.join(PROJECT_ROOT, "review", "index.backup.json")
     if os.path.exists(review_index):
         shutil.copy2(review_index, review_backup)
-    log("---- step 1/5: task1_index.py ----")
+    log("---- step 1/4: task1_index.py ----")
     rc = _run(crawl_py + [os.path.join(PROJECT_ROOT, "task1_index.py")],
               cwd=PROJECT_ROOT, log=log, timeout=300)
     if rc != 0:
@@ -148,31 +132,22 @@ def run_all(log_fn=None):
     except Exception as e:
         log(f"!! review/index.json 备份检查异常：{e}")
 
-    # 2) 各方向爬虫（单方向失败不中断）
-    log("---- step 2/5: 分方向爬虫 ----")
-    configs = sorted(glob.glob(os.path.join(DIRECTIONAL_DIR, "config_*.json")))
+    # 2) 山东官方招聘爬虫（单站失败不中断）
+    log("---- step 2/4: 山东官方招聘爬虫 ----")
     failed = []
-    for cfg in configs:
-        stem = _direction_output_name(cfg)
-        rel_cfg = os.path.join("xinjiang_directional", os.path.basename(cfg))
-        rel_json = os.path.join("xinjiang_output", stem + ".json")
-        rel_html = os.path.join("xinjiang_output", stem + ".html")
-        log(f"→ 方向: {stem}")
-        rc = _run(
-            crawl_py + [os.path.join("xinjiang_directional", "crawler.py"),
-                        "--config", rel_cfg,
-                        "--json", rel_json,
-                        "--output", rel_html],
-            cwd=CRAWL_SCRIPTS, log=log, timeout=CRAWL_TIMEOUT,
-        )
-        if rc != 0:
-            log(f"!! 方向 {stem} 失败（退出码 {rc}），继续下一个")
-            failed.append(stem)
+    rc = _run(
+        crawl_py + [os.path.join(SHANDONG_DIR, "shandong_official_crawler.py"),
+                    "--config", os.path.join(SHANDONG_DIR, "sources_config.json")],
+        cwd=SHANDONG_DIR, log=log, timeout=CRAWL_TIMEOUT,
+    )
+    if rc != 0:
+        log(f"!! 山东官方招聘爬虫失败（退出码 {rc}）")
+        failed.append("shandong_official")
 
-    # 3) merge_summary / 4) adapter_task1 / 5) combine（均为 stdlib 脚本，路径自解析）
-    for i, script in enumerate(["merge_summary.py", "adapter_task1.py", "combine.py"], start=3):
-        log(f"---- step {i}/5: {script} ----")
-        rc = _run(crawl_py + [script], cwd=DIRECTIONAL_DIR, log=log, timeout=300)
+    # 3) adapter_task1 / 4) combine（均为 stdlib 脚本，路径自解析）
+    for i, script in enumerate(["adapter_task1.py", "combine.py"], start=3):
+        log(f"---- step {i}/4: {script} ----")
+        rc = _run(crawl_py + [script], cwd=SHANDONG_DIR, log=log, timeout=300)
         if rc != 0:
             msg = f"{script} 失败（退出码 {rc}）"
             log("!! " + msg)
