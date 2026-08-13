@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """山东官方招聘网站爬虫（crawl4ai 驱动）。
 
-数据源：官方招聘网站.docx 整理出的 52 个网址（省级人社/人事考试/卫健委 + 16地市的人社/教育/卫健委招聘搜索页）。
+数据源：官方招聘网站.docx 整理出的 68 个网址（省级人社/人事考试/卫健委 + 16地市的人社/教育/卫健委/文旅局招聘搜索页）。
 这些搜索页大多用 JS 动态加载结果，因此用 crawl4ai 的真实浏览器渲染后提取链接。
 
 产出（shandong_output/ 目录）：
@@ -25,7 +25,7 @@ import hashlib
 import json
 import os
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from urllib.parse import unquote, urljoin
 
 try:
@@ -309,7 +309,8 @@ async def main():
     parser = argparse.ArgumentParser(description="山东官方招聘网站爬虫")
     parser.add_argument("--config", default=os.path.join(SCRIPT_DIR, "sources_config.json"))
     parser.add_argument("--limit", type=int, default=0, help="每信源最多取 N 条（0=不限制）")
-    parser.add_argument("--only", default="", help="只爬指定 group（rsj/edu/wjw/province），逗号分隔")
+    parser.add_argument("--only", default="", help="只爬指定 sub（rsj/edu/wjw/wlj/province），逗号分隔")
+    parser.add_argument("--days", type=int, default=10, help="只保留近 N 天内的文章（0=不过滤）")
     args = parser.parse_args()
 
     with open(args.config, encoding="utf-8") as f:
@@ -355,6 +356,12 @@ async def main():
             })
     # 按日期降序、去重
     flat.sort(key=lambda x: x.get("published_at") or "0000-00-00", reverse=True)
+
+    # 过期筛选：仅保留近 days 天内的文章（published_at 解析失败或为空视为未知，默认保留）
+    if args.days and args.days > 0:
+        cutoff = (datetime.now() - timedelta(days=args.days)).strftime("%Y-%m-%d")
+        flat = [a for a in flat if not a.get("published_at") or a["published_at"] >= cutoff]
+
     seen = set()
     dedup = []
     for a in flat:

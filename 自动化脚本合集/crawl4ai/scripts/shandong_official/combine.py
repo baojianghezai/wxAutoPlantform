@@ -9,7 +9,7 @@
 import os
 import json
 import glob
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from adapter_task1 import convert_task1_index
 
@@ -62,11 +62,25 @@ def fill_source_category(articles):
 
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="合并 web+wechat 文章 feed")
+    parser.add_argument("--days", type=int, default=10,
+                        help="只保留近 N 天内的文章（0=不过滤；空日期视为未知默认保留）")
+    args = parser.parse_args()
+
     web_articles = load_web_articles()
     wechat_articles, meta = convert_task1_index()
 
     all_articles = fill_source_category(web_articles + wechat_articles)
     all_articles.sort(key=sort_key, reverse=True)
+
+    # 过期筛选：仅保留近 days 天内的文章（published_at 为空/解析失败视为未知，默认保留）
+    if args.days and args.days > 0:
+        cutoff = (datetime.now() - timedelta(days=args.days)).strftime("%Y-%m-%d")
+        before = len(all_articles)
+        all_articles = [a for a in all_articles
+                        if not a.get("published_at") or a["published_at"] >= cutoff]
+        print(f"过期筛选：{before} → {len(all_articles)} 篇（近 {args.days} 天）")
 
     # 按 id 去重（web 用 web_xxx，wechat 用 A01，天然不冲突；同名同站兜底）
     seen = set()

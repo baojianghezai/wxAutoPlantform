@@ -1,6 +1,6 @@
 {
   "source_system": "shandong_official",
-  "description": "山东官方招聘网站（人社/教育/卫健委，省级+16地市），来源：官方招聘网站.docx",
+  "description": "山东官方招聘网站（省级 + 16地市的人社/教育/卫健委/文旅局），来源：官方招聘网站.docx",
   "max_concurrent": 3,
   "source_category": "recruitment",
   "sources": [
@@ -471,6 +471,150 @@
       "sub": "wjw",
       "enabled": true,
       "note": ""
+    },
+    {
+      "name": "济南",
+      "url": "https://jnwl.jinan.gov.cn/api-gateway/jpaas-jsearch-web-server/search?serviceId=U7LwsskqIV1cvlGBe0rzk&q=%E6%8B%9B%E8%81%98",
+      "group": "16市文旅局",
+      "category": "city",
+      "sub": "wlj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "青岛",
+      "url": "http://www.qingdao.gov.cn/unionsearch/?searchWord=%E6%8B%9B%E8%81%98&sitetype=all&areaId=32",
+      "group": "16市文旅局",
+      "category": "city",
+      "sub": "wlj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "淄博",
+      "url": "https://wh.zibo.gov.cn/jsearchfront/search.do?websiteid=370300000000017&tpl=92&q=%E6%8B%9B%E8%81%98&webid=6&cateid=1&pos=title%2Ccontent&x=0&y=0",
+      "group": "16市文旅局",
+      "category": "city",
+      "sub": "wlj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "枣庄",
+      "url": "http://swhhlyj.zaozhuang.gov.cn/irs-c-web/search.shtml?code=18f08df9ac8&dataTypeId=1136&searchWord=%E6%8B%9B%E8%81%98",
+      "group": "16市文旅局",
+      "category": "city",
+      "sub": "wlj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "东营",
+      "url": "http://dyswhhlyj.dongying.gov.cn/jsearchfront/search.do?q=%E6%8B%9B%E8%81%98&websiteid=370500000000014&pg=&p=1&tpl=200&category=&submit=",
+      "group": "16市文旅局",
+      "category": "city",
+      "sub": "wlj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "烟台",
+      "url": "https://whlyj.yantai.gov.cn/api-gateway/jpaas-jsearch-web-server/search?serviceId=adSbp06oXByQiWcYRNloA&q=%E6%8B%9B%E8%81%98",
+      "group": "16市文旅局",
+      "category": "city",
+      "sub": "wlj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "潍坊",
+      "url": "https://whhlyj.weifang.gov.cn/jiansuo/?keyword=%E6%8B%9B%E8%81%98",
+      "group": "16市文旅局",
+      "category": "city",
+      "sub": "wlj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "济宁",
+      "url": "https://whlyj.jining.gov.cn/jsearchfront/search.do?q=%E6%8B%9B%E8%81%98&websiteid=370800000000058&pos=title%2Ccontent&tpl=76",
+      "group": "16市文旅局",
+      "category": "city",
+      "sub": "wlj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "泰安",
+      "url": "https://whlyj.taian.gov.cn/jsearchfront/search.do?pagemode=result&websiteid=370900250000000&tpl=701&pagemode=result&webid=16&style=8&ck=0&pos=title%2Ccontent&q=%E6%8B%9B%E8%81%98",
+      "group": "16市文旅局",
+      "category": "city",
+      "sub": "wlj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "威海",
+      "url": "https://www.weihai.gov.cn/so/s?qt=%E6%8B%9B%E8%81%98",
+      "group": "16市文旅局",
+      "category": "city",
+      "sub": "wlj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "日照",
+      "url": "http://whlyj.rizhao.gov.cn/jsearchfront/search.do?pagemode=result&appid=1&q=%E6%8B%9B%E8%81%98&websiteid=371100000000022&style=22&ck=0&tpl=384&pos=title%2Ccontent&x=0&y=0",
+      "group": "16市文旅局",
+      "category": "city",
+      "sub": "wlj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "临沂",
+      "url": "https://wgxj.linyi.gov.cn/aop_views/search/modules/resultpc/soso.html?query=eyJrZXlXb3JkIjoi5oub6IGYIiwib3duZXIiOiIxMjg0NDIxOTc5IiwidG9rZW4iOiJ0b3VyaXN0IiwidXJsUHJlZml4IjoiL2FvcF9jb21wb25lbnQvIiwibGFuZyI6ImkxOG5femhfQ04ifQ==",
+      "group": "16市文旅局",
+      "category": "city",
+      "sub": "wlj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "德州",
+      "url": "https://www.dezhou.gov.cn/irs-c-web/search.shtml?code=18bf4dac24e&dataTypeId=930&searchWord=%E6%8B%9B%E8%81%98&x=0&y=0",
+      "group": "16市文旅局",
+      "category": "city",
+      "sub": "wlj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "滨州",
+      "url": "http://www.binzhou.gov.cn/module/xxgk/xxgk_selects.jsp?searchkeyword=%E6%8B%9B%E8%81%98",
+      "group": "16市文旅局",
+      "category": "city",
+      "sub": "wlj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "菏泽",
+      "url": "http://whly.heze.gov.cn/jiansuo/?keyword=%E6%8B%9B%E8%81%98",
+      "group": "16市文旅局",
+      "category": "city",
+      "sub": "wlj",
+      "enabled": true,
+      "note": ""
+    },
+    {
+      "name": "聊城",
+      "url": "http://wlj.liaocheng.gov.cn/",
+      "group": "16市文旅局",
+      "category": "city",
+      "sub": "wlj",
+      "enabled": true,
+      "note": "docx中聊城文旅局URL误写为德州，此处用真实官网"
     }
   ]
 }

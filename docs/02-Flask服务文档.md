@@ -145,7 +145,7 @@
 `run_all(log_fn) -> {"code":0|1, "msg", "stats"}`，4 步：
 
 1. **task1_index.py**：抓公众号 RSS 信源 → `review/index.json`；先备份 `index.backup.json`，若新产出 0 条且备份非空则还原（防 RSS 不可达清空信源）。
-2. **山东官方招聘爬虫**：`crawl4ai/scripts/shandong_official/shandong_official_crawler.py --config sources_config.json`（52 个省级+16地市人社/教育/卫健委招聘页，JS 渲染；超时 1800s）。
+2. **山东官方招聘爬虫**：`crawl4ai/scripts/shandong_official/shandong_official_crawler.py --config sources_config.json`（68 个省级+16地市人社/教育/卫健委/文旅局招聘页，JS 渲染；超时 1800s）。
 3. **adapter_task1.py**：`review/index.json` → 统一 articles 契约。
 4. **combine.py**：web（山东爬虫）+ wechat 合并去重 → `shandong_output/unified_articles.json`。
 
